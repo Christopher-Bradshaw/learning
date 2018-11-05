@@ -1,6 +1,6 @@
 # The basics of MPI
 
-See [Intro to parallel Programming chapter 3](https://www.elsevier.com/books/an-introduction-to-parallel-programming/pacheco/978-0-12-374260-5), and [my notes/examples on mpi4py](https://github.com/Christopher-Bradshaw/python_learning/tree/master/mpi).
+See [Intro to parallel Programming chapter 3](https://www.elsevier.com/books/an-introduction-to-parallel-programming/pacheco/978-0-12-374260-5), and [my notes/examples on mpi4py](https://github.com/Christopher-Bradshaw/learning/tree/master/mpi).
 
 ## What is MPI
 

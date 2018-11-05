@@ -1,6 +1,6 @@
 # The basics of OpenMP
 
-See [Intro to parallel Programming chapter 5](https://www.elsevier.com/books/an-introduction-to-parallel-programming/pacheco/978-0-12-374260-5). I've also played with the cython implementation of OpenMP [here](https://github.com/Christopher-Bradshaw/python_learning/tree/master/cython/parallelization).
+See [Intro to parallel Programming chapter 5](https://www.elsevier.com/books/an-introduction-to-parallel-programming/pacheco/978-0-12-374260-5). I've also played with the cython implementation of OpenMP [here](https://github.com/Christopher-Bradshaw/learning/tree/master/cython/parallelization).
 
 The [8 page spec summary](https://www.openmp.org/wp-content/uploads/OpenMP3.0-SummarySpec.pdf) is also pretty useful.
 
