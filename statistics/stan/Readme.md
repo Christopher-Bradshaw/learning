@@ -38,10 +38,10 @@ Variables can be constrained (e.g. to be positive).
 
 Example set of definitions
 ```
-real theta;								// declares unconstrained real
-int<lower = 0> x;						// declares int with lower bound
-vector<lower = -1, upper = 1>[3] rho; 	// declares vector of length 3 with lower and upper bounds
-real sum = 0							// declares and assigns real
+real theta;	                            // declares unconstrained real
+int<lower = 0> x;                       // declares int with lower bound
+vector<lower = -1, upper = 1>[3] rho;   // declares vector of length 3 with lower and upper bounds
+real sum = 0                            // declares and assigns real
 ```
 
 ### Blocks
