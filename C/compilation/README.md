@@ -1,5 +1,6 @@
 # What is happening when you compile something?
 
+See also https://github.com/green7ea/cpp-compilation/blob/master/README.md
 
 ## Compiling a simple library
 
