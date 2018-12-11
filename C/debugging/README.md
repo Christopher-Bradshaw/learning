@@ -27,8 +27,8 @@ If you were running without GDB you probably saw a log line like `Aborted (core 
 Where it is depends on your OS. It might just be in the local dir, but it more likely has been sent to an automatic reporting/logging service. On Fedora this is `coredump`. To get access to one:
 
 * Use `coredumpctl` to see all coredumps. Find the PID of the one you care about
-* `coredumpctl dump <PID> --output <SOMEFILE>
-* `gdb /path/to/binary <SOMEFILE>
+* `coredumpctl dump <PID> --output <SOMEFILE>`
+* `gdb /path/to/binary <SOMEFILE>`
 
 And now you are in the same state as the post crash w GDB world.
 
