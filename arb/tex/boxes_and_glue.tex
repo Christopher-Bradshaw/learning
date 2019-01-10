@@ -1,0 +1,70 @@
+% This is the solution to exercise 11.5 in the TeXbook
+% If eventually defines `demobox` which shows the TeX boxes
+\def\dolist{\afterassignment\dodolist\let\next= }
+\def\dodolist{\ifx\next\endlist \let\next\relax
+\else \\\let\next\dolist \fi
+\next}
+\def\endlist{\endlist}
+\def\hidehrule#1#2{\kern-#1%
+\hrule height#1 depth#2 \kern-#2 }
+\def\hidevrule#1#2{\kern-#1{\dimen0=#1
+\advance\dimen0 by#2\vrule width\dimen0}\kern-#2 }
+\def\makeblankbox#1#2{\hbox{\lower\dp0\vbox{\hidehrule{#1}{#2}%
+\kern-#1 % overlap the rules at the corners
+\hbox to \wd0{\hidevrule{#1}{#2}%
+\raise\ht0\vbox to #1{}% set the vrule height
+\lower\dp0\vtop to #1{}% set the vrule depth
+\hfil\hidevrule{#2}{#1}}%
+\kern-#1\hidehrule{#2}{#1}}}}
+\def\maketypebox{\makeblankbox{0pt}{1pt}}
+\def\makelightbox{\makeblankbox{.2pt}{.2pt}}
+\def\\{\expandafter\if\space\next\
+\else \setbox0=\hbox{\next}\maketypebox\fi}
+\def\demobox#1{\setbox0=\hbox{\dolist#1\endlist}%
+\copy0\kern-\wd0\makelightbox}
+\def\demoboxw#1{#1: \demobox{#1}}
+
+
+Each word is made up of characters that fit into boxes,
+\demoboxw{test}
+
+And a sentence has lots of those boxes,
+\demoboxw{The quick brown fox.}
+
+TeX will decide on how to split lines (compare to old typography where you would manually set up spacing etc for each line). Once lines have been split, TeX views a paragraph (like this!) as a large box that contains a verticle list of boxes representing the lines. Each of those lines are made up of multiple smaller horizontal blocks containing the letters.
+
+We can manually specify all these things though:
+
+\vbox{abc}\vbox{b}\vbox{c}
+
+Ok great we have all these boxes for letters, but how exactly are they joined together? TeX has a concept of "glue". The horizontal gap between words is defined as some length but this length can change up to some maximum upper and minimum lower bound (based on the tolerance). Let's try some sentences with manually created spaces.
+
+\medskip{}
+Just with normal spacebar spaces.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+
+\smallskip{}
+Now with an 8 pt skip. Note how TeX can't justify the lines well because these spaces are fixed.
+\def\ms{\hskip8pt}
+
+Lorem\ms{}ipsum\ms{}dolor\ms{}sit\ms{}amet,\ms{}consectetur\ms{}adipiscing\ms{}elit,\ms{}sed\ms{}do\ms{}eiusmod\ms{}tempor\ms{}incididunt\ms{}ut\ms{}labore\ms{}et\ms{}dolore\ms{}magna\ms{}aliqua.\ms{}Ut\ms{}enim\ms{}ad\ms{}minim\ms{}veniam,\ms{}quis\ms{}nostrud\ms{}exercitation\ms{}ullamco\ms{}laboris\ms{}nisi\ms{}ut\ms{}aliquip\ms{}ex\ms{}ea\ms{}commodo\ms{}consequat.\ms{}Duis\ms{}aute\ms{}irure\ms{}dolor\ms{}in\ms{}reprehenderit\ms{}in\ms{}voluptate\ms{}velit\ms{}esse\ms{}cillum\ms{}dolore\ms{}eu\ms{}fugiat\ms{}nulla\ms{}pariatur.
+
+\smallskip{}
+8 pt skip with 1pt stretch and shrink. TeX can now justify fine.
+\def\ms{\hskip8pt plus 1pt minus 1pt}
+
+Lorem\ms{}ipsum\ms{}dolor\ms{}sit\ms{}amet,\ms{}consectetur\ms{}adipiscing\ms{}elit,\ms{}sed\ms{}do\ms{}eiusmod\ms{}tempor\ms{}incididunt\ms{}ut\ms{}labore\ms{}et\ms{}dolore\ms{}magna\ms{}aliqua.\ms{}Ut\ms{}enim\ms{}ad\ms{}minim\ms{}veniam,\ms{}quis\ms{}nostrud\ms{}exercitation\ms{}ullamco\ms{}laboris\ms{}nisi\ms{}ut\ms{}aliquip\ms{}ex\ms{}ea\ms{}commodo\ms{}consequat.\ms{}Duis\ms{}aute\ms{}irure\ms{}dolor\ms{}in\ms{}reprehenderit\ms{}in\ms{}voluptate\ms{}velit\ms{}esse\ms{}cillum\ms{}dolore\ms{}eu\ms{}fugiat\ms{}nulla\ms{}pariatur.
+\medskip{}
+
+Also note that the spaces around these examples were inserted with vskip.
+
+
+TeX does some intelligent things with glue to improve the style of the test. For example, the strechability of the glue after punctuation is larger than that after a normal work. TeX things that words within a sentence should be kept closer together, and sentences themselves can be separated a bit more (if we need to add some space). This makes sense! However, TeX can never know whether a punctuation mark, e.g. a fullstop is actually the end of a sentence or from an abbreviation (e.g., Prof.).
+The tie mark (\~{}) can be used to tell TeX to insert a normal space here, and to not line break at this point - So Prof.~Bob is written ``Prof.\~{}Bob''. Another edge case is that punctuation after a capital letter is not considered the end of a sentence. To made a sentence that ends in a capital e.g.\~{}NASA be considered the end of a sentence folow it with an empty hbox.
+Another example of the user needing to manually intervene comes with the {\sl italic correction\/}. Slanted fonts protrude to the right of their box and so if we don't add a little bit of space they can crash into the {\sl next letter\/}. Compare {\sl corrected V\/}. {\sl uncorrected V\/}.
+
+This is a trade-off. You have a computer that is trying to be clever (by using punctuation to sensibly choose spacing {\bf most of the time}) but that requires help in unusual circumstances. The alternative would have the user specifying things in the common case (period denotes end of sentence).
+
+
+\end{}
