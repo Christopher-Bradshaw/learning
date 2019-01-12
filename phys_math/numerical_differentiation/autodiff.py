@@ -66,6 +66,7 @@ class ad_num():
                     other.value * self.value ** (other.value - 1) * self.derivative
             )
         # Exponent: a ** f(x)
+        # The f(x) ** g(x) equation would also work here, but I like keeping them separate
         elif self.derivative == 0:
             return ad_num(
                     self.value ** other.value,
