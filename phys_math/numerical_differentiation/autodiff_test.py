@@ -2,14 +2,11 @@ import pytest
 from autodiff import autodiff
 from finite_diff import finite_diff
 
-@pytest.mark.skip()
-def test_failing():
-    f = lambda x1: 2
-    print(autodiff(f, 2))
-
-
 class TestBasic():
     def test_d_of_constant(self):
+        res = autodiff(lambda x1: 2, 111)
+        assert res.value == 2 and res.derivative == 0
+
         res = autodiff(lambda x1, x2: x2, 2, 3)
         assert res.value == 3 and res.derivative == 0
 
