@@ -2,9 +2,3 @@ __pycache__
 .pytest_cache
 .mypy_cache
 *.ipynb_checkpoints
-
-# cython
-*.so
-*.html
-*.pyc
-build
