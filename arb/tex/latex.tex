@@ -1,0 +1,89 @@
+\documentclass{article}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{color}
+
+
+
+\begin{document}
+\author{CB}
+\title{Intro}
+% \maketitle{} % Do we want to typeset this info?
+
+
+\section{What are all these *TeX things?}
+Up until now I've been talking purely about the Tex. What is this latex thing? Some resources:
+\href{https://www.texpad.com/support/latex/advanced/tex-vs-latex}{1}
+\href{https://tex.stackexchange.com/questions/49/what-is-the-difference-between-tex-and-latex}{2}
+\href{http://www.tug.org/levels.html}{3}.
+
+As we have seen so far, TeX takes a file and outputs a dvi (which can be converted to a pdf). LaTeX appears to be (I still haven't found a clear description of exactly what it is) a language on top of TeX (note, not a superset of TeX) that uses TeX to typeset. There are then extensions to LaTeX that allow output to something other than a dvi (e.g.\ pdflatex -- pdf).
+
+We write in LaTeX because it adds a bunch of useful things to TeX -- using LaTeX is much less manual.
+
+\section{Structure of a Latex Document}
+
+The basic LaTeX doc requires a documentclass and a begin and end document.
+
+\begin{verbatim}
+Anything here is an error
+\documentclass[options]{some class}
+Preamble
+\begin{document}
+Top matter
+Content
+\end{document}
+Anything here will not be typeset
+\end{verbatim}
+
+\subsection{Document Class}
+
+See \href{https://en.wikibooks.org/wiki/LaTeX/Document_Structure#Document_classes}{here} for a list of some document classes.
+
+The document class affects which macros are defined and what they do. For example, in articles the main divisions are sections and then subsections. In a book they are chapters, sections, subsections. In a letter none of those are defined!
+
+\subsection{Preamble}
+
+This contains commands that affect the document as a whole. It is a place to define things, import packages and give \LaTeX{} commands.
+
+\subsubsection{Pacakges}
+
+LaTeX by default can't do everything. In the same way that programming languages have libraries, \LaTeX{} has packages. Some packages come with the LaTeX distribution (e.g.\ I use TexLive), others can be manually downloaded and installed. Including a package with \lstinline{\usepackage} will make whatever macros are provided in that package available.
+
+Theoretically you can get documentation with \lstinline{texdoc <package>} but this breaks for me so just go to CTAN.
+
+
+Some examples:
+
+\begin{itemize}
+    \item Color: \textcolor{red}{Hi!}
+\end{itemize}
+
+
+\subsection{Document}
+
+We need this to separate what is preamble and what is content!
+
+\subsection{Top Matter}
+
+You can define things about the article, e.g.\ who the author is, when it was written. This can easily be typeset -- at any location -- with \lstinline{\maketitle}. It is just convention that these commands go at the top.
+
+
+\section{Latex files}
+
+Until now we have just had single .tex files. However, with packages and compilation there are many file types to know about.
+
+\begin{itemize}
+    \item .tex: The main file.
+    \item .sty: A pacakge. Load into the main file with \lstinline{\usepackage}
+    \item .cls: A class. Loaded with \lstinline{\documentclass} (e.g.\ article.cls)
+
+\end{itemize}
+
+\section{Compiling Latex}
+
+This 
+
+\tableofcontents
+\end{document}
+This is not typeset!

@@ -24,4 +24,3 @@ Just use assert.
 See `pytest --help` for a full list
 * `-s`: By default pytest suppresses stdout. With -s, show stdout
 * `-k "some_expression"`: Only run tests that match the expression. e.g. "Add1 and positive_number"
-

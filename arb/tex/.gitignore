@@ -1,2 +1,5 @@
 *.dvi
 *.log
+*.out
+*.toc
+*.aux
