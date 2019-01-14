@@ -3,29 +3,39 @@
 \usepackage{listings}
 \usepackage{color}
 
-
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+}
+\lstset{style=mystyle}
 
 \begin{document}
 \author{CB}
 \title{Intro}
 % \maketitle{} % Do we want to typeset this info?
 
+\tableofcontents
 
 \section{What are all these *TeX things?}
-Up until now I've been talking purely about the Tex. What is this latex thing? Some resources:
+Up until now I've been talking purely about the \TeX{}. What is this \LaTeX{} thing? Some resources
 \href{https://www.texpad.com/support/latex/advanced/tex-vs-latex}{1}
 \href{https://tex.stackexchange.com/questions/49/what-is-the-difference-between-tex-and-latex}{2}
-\href{http://www.tug.org/levels.html}{3}.
+\href{http://www.tug.org/levels.html}{3} and my summary:
 
-As we have seen so far, TeX takes a file and outputs a dvi (which can be converted to a pdf). LaTeX appears to be (I still haven't found a clear description of exactly what it is) a language on top of TeX (note, not a superset of TeX) that uses TeX to typeset. There are then extensions to LaTeX that allow output to something other than a dvi (e.g.\ pdflatex -- pdf).
+\begin{enumerate}
+    \item \TeX{} does the typesetting
+    \item \LaTeX{} adds a lot of features (macros) on top of \TeX{} that make it easier to use
+    \item pdf\LaTeX{} (or Xe\TeX{}, etc) are the engines that compile the \LaTeX{}
+    \item \TeX{}Live (or MiK\TeX{}, etc) are distributions that provide the engine and a number of commonly used pacakges
+\end{enumerate}
 
 We write in LaTeX because it adds a bunch of useful things to TeX -- using LaTeX is much less manual.
 
 \section{Structure of a Latex Document}
 
-The basic LaTeX doc requires a documentclass and a begin and end document.
+The structure of a latex document looks like this:
 
-\begin{verbatim}
+\begin{lstlisting}
 Anything here is an error
 \documentclass[options]{some class}
 Preamble
@@ -34,7 +44,7 @@ Top matter
 Content
 \end{document}
 Anything here will not be typeset
-\end{verbatim}
+\end{lstlisting}
 
 \subsection{Document Class}
 
@@ -48,42 +58,134 @@ This contains commands that affect the document as a whole. It is a place to def
 
 \subsubsection{Pacakges}
 
-LaTeX by default can't do everything. In the same way that programming languages have libraries, \LaTeX{} has packages. Some packages come with the LaTeX distribution (e.g.\ I use TexLive), others can be manually downloaded and installed. Including a package with \lstinline{\usepackage} will make whatever macros are provided in that package available.
+LaTeX by default can't do everything. In the same way that programming languages have libraries, \LaTeX{} has packages. Some packages come with the LaTeX distribution (e.g.\ I use TexLive), others can be manually downloaded and installed. Including a package with \lstinline|\usepackage| will make whatever macros are provided in that package available.
 
-Theoretically you can get documentation with \lstinline{texdoc <package>} but this breaks for me so just go to CTAN.
-
+Theoretically you can get documentation with \lstinline|texdoc <package>| but this breaks for me so just go to CTAN.
 
 Some examples:
 
 \begin{itemize}
     \item Color: \textcolor{red}{Hi!}
+    \item Hyperlinks: \href{https://ctan.org/pkg/hyperref?lang=en}{hyperref docs}
 \end{itemize}
 
 
 \subsection{Document}
 
-We need this to separate what is preamble and what is content!
+We need this to separate what is preamble and what is content.
 
 \subsection{Top Matter}
 
-You can define things about the article, e.g.\ who the author is, when it was written. This can easily be typeset -- at any location -- with \lstinline{\maketitle}. It is just convention that these commands go at the top.
+You can define things about the article, e.g.\ who the author is, when it was written. This can easily be typeset -- at any location -- with \lstinline|\maketitle|. It is just convention that these commands go at the top.
 
 
-\section{Latex files}
+\section{Files used by \LaTeX{}}
 
 Until now we have just had single .tex files. However, with packages and compilation there are many file types to know about.
+See \href{https://en.wikibooks.org/wiki/LaTeX/Basics#Ancillary_files}{\LaTeX{} ancillary files} for a full list.
 
+\subsection{Inputs}
 \begin{itemize}
     \item .tex: The main file.
-    \item .sty: A pacakge. Load into the main file with \lstinline{\usepackage}
-    \item .cls: A class. Loaded with \lstinline{\documentclass} (e.g.\ article.cls)
+    \item .sty: A pacakge. Load into the main file with \lstinline|\usepackage|
+    \item .cls: A class. Loaded with \lstinline|\documentclass| (e.g.\ article.cls)
+    \item .bib: A bibliography file in the \href{https://en.wikipedia.org/wiki/BibTeX}{bibtex} format.
+\end{itemize}
 
+\subsection{Intermediate}
+Note that most of these are just text files so you can look in them and see what they contain.
+\begin{itemize}
+    \item .log: A detailed account of what happened during the last compiler run
+    \item .toc: A list of section headers (table of contents). See also .lof (list of figures), .lot (tables) etc.
+    \item .aux: Another file that transports info from one compiler run to another \cite{Oetiker2007}.
+    \item .out: list of hyperrefs
+    \item .synctex: A file that allows the pdf and text file to be synced -- i.e.\ if you click somewhere in the pdf it moves the cursor to the same place in the text (if the editor supports this).
+    \item .blg: The log file from bibtex
+    \item .bbl: The output of bibtex containing the formatted references
+\end{itemize}
+
+
+\subsection{Outputs}
+\begin{itemize}
+    \item .dvi: An output format (the default for \TeX{}). See \href{https://en.wikipedia.org/wiki/Device_independent_file_format}{wikipedia}.
+    \item .pdf: Thank goodness we finally got here!
 \end{itemize}
 
 \section{Compiling Latex}
 
-This 
+A \LaTeX{} document can be very complicated. There may be figures cross referenced in the text, bibliographic references, and a table of contents. Compiling this all into a pdf seems like it might be quite hard. So what happens? Some resources:
+\href{https://tex.stackexchange.com/questions/121383/how-does-the-latex-compile-chain-work-exactly}{how does the compile chain work}
+\href{https://en.wikibooks.org/wiki/LaTeX/Basics#Ancillary_files}{basics}.
 
-\tableofcontents
+To start with note ``It may be necessary to run \LaTeX{} several times to get the table of contents and all internal references right'' \cite{Oetiker2007}.
+
+Let's cleanup all intermediate files for this doc and compile (\lstinline|pdflatex latex.tex|)
+and see what happens:
+\begin{enumerate}
+    \item We now have the aux, log, out, pdf, toc files. However the place where we expect the {\it Table of contents\/} to be is empty and we get a warning in the log and printed as output: 
+\begin{lstlisting}
+Package rerunfilecheck Warning:
+File `latex.out' has changed.
+Rerun to get outlines right
+\end{lstlisting}
+        The package \href{https://ctan.org/pkg/rerunfilecheck}{rerunfilecheck} {\sl provides additional rerun warnings if some auxiliary files have changed.\/} So this is telling us that an intermediate file hanged so we should rerun to have this info taken into account in the final pdf.
+    \item No warnings, TOC is inserted, but some page numbers are wrong.
+    \item pdf now looks good!
+\end{enumerate}
+
+
+Why do we need multiple runs? \LaTeX{} is a single pass compiler. So it doesn't go back and update things. So, for example if you want a TOC at the start of the document, you can't have it because we don't get know what the sections are or what page they will be on! You first need to run the compiler to generate the list of sections and their locations, store these in temp files, then run again to insert the TOC\@. Note that adding the TOC might move things around (so the page numbers might be wrong) so you might need to run it again!
+
+\subsection{Adding Bibliography}
+
+Having a bibliography can complicate this even more. Let's add a simple .bib file referencing the TexBook \cite{Knuth1986} and the Not so Short Introduction to \LaTeX{} \cite{Oetiker2007}. To do this we add:
+\begin{lstlisting}
+\bibliography{latex}      % the file name of the bib
+\bibliographystyle{unsrt} % the style we want to use
+\end{lstlisting}
+\noindent to the end of the document. Now how to compile this?
+
+As before we can run pdflatex 3 times to get everything else correct, but the bibliography is still empty and the citation is a question mark. The final error is
+\begin{lstlisting}
+No file latex.bbl.
+LaTeX Warning: There were undefined references.
+\end{lstlisting}
+So how do we get a .bbl file?
+
+\begin{lstlisting}
+bibtex latex.bib
+\end{lstlisting}
+
+Bibtext reads the aux file which contains the location of the bibliography, the bib style and the list of citations. Note that this means that bibtex needs to be run {\bf after the pdflatex has generated the .aux file}. Bibtex then reads the bib file which contains all possible citations. If pulls out the ones that are used and formats them according to the given style. These it saves in the .bbl file.
+
+Running pdflatex twice more eventually gets this all included in the pdf, though I'm not exactly sure why it takes two runs. This is why the routine that works in most (though not all) is often
+
+\begin{lstlisting}
+pdflatex file && bibtex file && pdflatex file && \
+pdflatex file
+\end{lstlisting}
+
+\subsection{Automated Tools}
+
+Manually compiling is a pain. Fortunately there are automated tools that work out exactly what needs to be run how many times. See \href{https://mg.readthedocs.io/latexmk.html}{latexmk}.
+
+To compile a single file in one command, run
+\begin{lstlisting}
+latexmk -pdf file
+\end{lstlisting}
+
+To watch for updates to the files and continually compile
+\begin{lstlisting}
+latexmk -pdf -pvc file
+\end{lstlisting}
+
+To cleanup all non-input files
+\begin{lstlisting}
+latexmk -c -bibtex latex
+\end{lstlisting}
+
+\bibliography{latex}
+\bibliographystyle{unsrt}
+
 \end{document}
 This is not typeset!
