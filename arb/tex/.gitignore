@@ -3,7 +3,6 @@
 *.out
 *.toc
 *.aux
-*.bib
 *.bbl
 *.blg
 *.fdb_latexmk
