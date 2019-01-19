@@ -19,3 +19,9 @@ print(B*v)
 print(B * B)
 print(B.inverse())
 print(B.det()) # or .determinant()
+
+
+# Eigen
+var("a b")
+H = matrix([[8*a^2*b + 2, -4 * a * b], [-4 * a * b, 2 * b]])
+print(H.substitute(a=1, b=100).eigenvalues())
