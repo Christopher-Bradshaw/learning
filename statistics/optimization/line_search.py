@@ -1,6 +1,5 @@
 import numpy as np
 
-
 # See algo 3.5 and 3.6 in Nocedal/Wright
 # Given a function f, the gradient grad_f, the current location x0, the step direction p,
 # and the maximum step size a_max.
@@ -33,15 +32,12 @@ def get_line_length(f, grad_f, x0, p, a_max, c1=1e-4, c2=0.5):
                 return zoom(a_lo, a_j)
 
             # sw1 must be fulfilled if we are here
-
             if sw2(a_j):
                 return a_j
             elif gphi(a_j) * (a_hi - a_lo) >= 0:
                 a_hi = a_j
             else:
                 a_lo = a_j
-
-
 
     i = 1
     a_i = a_max / 2 # No good reason. It just needs to be in (0, a_max)
