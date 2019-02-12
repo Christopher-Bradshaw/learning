@@ -19,16 +19,15 @@ def plot_func(f, lim=None, typ="contour"):
     elif typ == "image":
         fig, ax = plt.subplots()
         fig.set_size_inches((fig.get_size_inches()[1], fig.get_size_inches()[1]))
-        img = ax.imshow(res, cmap="Reds", origin="lower")
+        img = ax.imshow(res, cmap="Reds", origin="lower", extent=(x[0], x[-1], y[0], y[-1]))
         fig.colorbar(img)
     elif typ == "surface":
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
         ax.plot_surface(grid[0], grid[1], res)
-
     else:
         raise Exception("Unknown plot typ")
 
-    ax.set(xlim=lim[:2], ylim=lim[2:])
+    # ax.set(xlim=lim[:2], ylim=lim[2:])
 
     return ax
