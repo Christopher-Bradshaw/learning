@@ -4,7 +4,7 @@ import numpy as np
 # Given a function f, the gradient grad_f, the current location x0, the step direction p,
 # and the maximum step size a_max.
 # Return a step size that fulfills the strong wolfe conditions.
-def get_line_length(f, grad_f, x0, p, a_max, c1=1e-4, c2=0.5):
+def get_line_length(f, grad_f, x0, p, a_max, c1=1e-4, c2=0.4):
     try:
         assert np.isclose(np.linalg.norm(np.linalg.norm(p)), 1)
     except AssertionError:

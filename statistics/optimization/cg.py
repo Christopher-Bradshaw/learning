@@ -2,32 +2,43 @@ import numpy as np
 from line_search import get_line_length
 
 # FR is a non-linear CG method. See algo 5.4 in Nocedal/Wright
-def fletcher_reeves(f, grad_f, x):
+def fletcher_reeves(f, grad_f, x, restart=None, use_pr=False):
+    assert not (restart and use_pr) # Either FR, FR w restarts, or PR
     dims = len(x)
-    a_max = 10
+    a_max = 1
 
-    gf = grad_f(x)
+    gf, gf_prev = grad_f(x), None
     p = -gf
 
     # Some things to evaluate performance
     positions = [x]
 
     while np.linalg.norm(gf) > 1e-7:
-        p = p/np.linalg.norm(p) # Our line length computation expects this
-        alpha = get_line_length(f, grad_f, x, p, a_max)
+        # Our line length computation expects p to be of unit length
+        # So scale the input, then scale the output to be correct for our p
+        # N.B. **don't actually scale p here else setting the new p will be wrong**
+        p_scale = np.linalg.norm(p)
+        alpha = get_line_length(f, grad_f, x, p / p_scale, a_max, c1=1e-3, c2=0.4) / p_scale
 
         x = x + alpha * p
         positions.append(x)
 
         gf_next = grad_f(x)
 
-        beta = np.matmul(gf_next, gf_next) / np.matmul(gf, gf)
+        # FR with restarts
+        if restart and np.dot(gf, gf_next) / np.linalg.norm(gf_next)**2 > restart:
+            beta = 0
+        # PR
+        elif use_pr:
+            beta = max(np.dot(gf_next, gf_next - gf) / np.linalg.norm(gf)**2, 0)
+        # Default FR
+        else:
+            beta = np.matmul(gf_next, gf_next) / np.matmul(gf, gf)
+
         gf = gf_next
 
         p = -gf + beta * p
 
-        if len(positions) > 10:
-            break
     return np.array(positions)
 
 
