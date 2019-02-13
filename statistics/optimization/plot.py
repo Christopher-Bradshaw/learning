@@ -28,6 +28,6 @@ def plot_func(f, lim=None, typ="contour"):
     else:
         raise Exception("Unknown plot typ")
 
-    # ax.set(xlim=lim[:2], ylim=lim[2:])
+    ax.set(xlim=lim[:2], ylim=lim[2:])
 
     return ax

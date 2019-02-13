@@ -5,8 +5,10 @@ import numpy as np
 # and the maximum step size a_max.
 # Return a step size that fulfills the strong wolfe conditions.
 def get_line_length(f, grad_f, x0, p, a_max, c1=1e-4, c2=0.5):
-    assert np.isclose(np.linalg.norm(np.linalg.norm(p)), 1)
-    # import pdb; pdb.set_trace()
+    try:
+        assert np.isclose(np.linalg.norm(np.linalg.norm(p)), 1)
+    except AssertionError:
+        raise Exception("This expects a normalized direction!")
 
     phi = lambda a: f(x0 + a * p)
     gphi = lambda a: np.dot(grad_f(x0 + a * p), p)
