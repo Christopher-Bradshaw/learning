@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-def plot_func(f, lim=None, typ="contour"):
+def surface_2d(f, lim=None, typ="contour"):
     lim = lim or np.array([-1, 1, -1, 1]) * 2
     x = np.linspace(lim[0], lim[1], num=200)
     y = np.linspace(lim[2], lim[3], num=200)

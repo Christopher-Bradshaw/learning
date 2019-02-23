@@ -1,18 +1,20 @@
 import numpy as np
-from line_search import get_line_length
+from .line_search import get_line_length
 
 # FR is a non-linear CG method. See algo 5.4 in Nocedal/Wright
 def fletcher_reeves(f, grad_f, x, restart=None, use_pr=False):
     assert not (restart and use_pr) # Either FR, FR w restarts, or PR
-    dims = len(x)
+    # Come back and look at http://www.unilim.fr/laco/rapports/2003/R2003_10.pdf
+    if use_pr: print("This might not work - this needs a modification to wolfe to ensure descent that I can't find...")
+
     a_max = 1
 
-    gf, gf_prev = grad_f(x), None
+    # Important to start in the direction of steepest descent
+    gf = grad_f(x)
     p = -gf
 
-    # Some things to evaluate performance
+    # To evaluate performance
     positions = [x]
-
     while np.linalg.norm(gf) > 1e-7:
         # Our line length computation expects p to be of unit length
         # So scale the input, then scale the output to be correct for our p
@@ -30,7 +32,10 @@ def fletcher_reeves(f, grad_f, x, restart=None, use_pr=False):
             beta = 0
         # PR
         elif use_pr:
-            beta = max(np.dot(gf_next, gf_next - gf) / np.linalg.norm(gf)**2, 0)
+            beta = max(
+                    np.dot(gf_next, gf_next - gf) / np.linalg.norm(gf)**2,
+                    0
+            )
         # Default FR
         else:
             beta = np.matmul(gf_next, gf_next) / np.matmul(gf, gf)
@@ -40,9 +45,6 @@ def fletcher_reeves(f, grad_f, x, restart=None, use_pr=False):
         p = -gf + beta * p
 
     return np.array(positions)
-
-
-
 
 # The below are both for convex functions
 
@@ -82,7 +84,7 @@ def conjugate_gradient(A, b, x):
 # Algorithm 5.1 in Nocedal/Wright
 # This is less efficient than the other one
 # Kept here because it is a bit easier to follow
-def conjugate_gradient_5_1(A, b, x):
+def _inefficient_but_easy_to_read_CG(A, b, x):
     dims = A.shape[0]
     assert A.shape == (dims, dims)
     assert x.shape == (dims,)
