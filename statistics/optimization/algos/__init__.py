@@ -5,3 +5,4 @@ from .models import quadratic
 from .trust_region import trust_region
 from .cauchy_point import cauchy_point
 from .dogleg import dogleg
+from .newton import newton, BFGS, L_BFGS
