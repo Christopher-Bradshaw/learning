@@ -31,7 +31,7 @@ def BFGS(f, grad_f, hess_0, x):
     positions = [x]
     while np.linalg.norm(grad_f(x)) > 1e-7:
         p = -np.matmul(np.linalg.inv(hess_0), grad_f(x))
-        p /= np.linalg.norm(p)
+        # p /= np.linalg.norm(p)
 
         a = get_line_length(f, grad_f, x, p, a_max=10)
 
@@ -79,11 +79,16 @@ def L_BFGS(f, grad_f, x, memory_len=10):
 
     positions = [x]
     i = 0
-    while np.linalg.norm(grad_f(x)) > 1e-7:
+    # import pdb; pdb.set_trace()
+    while np.linalg.norm(grad_f(x)) > 1e-2:
+        if i % 1 == 0:
+            print(x, np.linalg.norm(grad_f(x)))
+        i += 1
         p = -estimate_search_dir(grad_f(x), prev_s, prev_y, rho)
         p /= np.linalg.norm(p)
+        # print(np.linalg.norm(p))
 
-        a = get_line_length(f, grad_f, x, p, a_max=2)
+        a = get_line_length(f, grad_f, x, p, a_max=1000, c1=1e-4, c2=0.80)
 
         x_next = x + a*p
 
