@@ -1,8 +1,10 @@
 \documentclass{article}
 
 \usepackage{xcolor}
+\usepackage{qtree}
 
-\newcommand{\hl}[1]{\colorbox{green}{#1}}
+% \newcommand{\hl}[1]{\colorbox{green}{#1}}
+\newcommand{\hl}[1]{\underline{#1}}
 \newcommand{\hlq}[1]{\colorbox{red}{#1}}
 \newcommand{\example}[1]{\newline \textit{#1}}
 
@@ -11,9 +13,15 @@
 
 \section{Grammar}
 
+
+\subsection{Some Definitions}
+
+Predicate: The verb like part of a clause.
+\example{I \hl{listened to him talk}}
+
 \subsection{Clauses}
 
-A group of words with both subject or object. Divided into a few categories:
+A group of words with both subject and predicate. Divided into a few categories:
 
 Independent Clause: A group of words that could stand on its own as a sentence. It is a complete thought.
 \example{\hl{I am learning to write.}}
@@ -30,7 +38,7 @@ Restrictive (or defining, integrated relative) clause: A clause that functions a
 \example{I fed the dog \hl{that I found outside}}
 
 Nonrestrictive (or non-defining, non-integrated relative) clause: This is also an adjectival clause, though it contains non-essential information. It is offset by commas.
-\example{Bob, who I met last week, is a nice guy}
+\example{Bob, \hl{who I met last week}, is a nice guy}
 
 
 \subsection{Phrases}
@@ -41,7 +49,26 @@ Prepositional Phrase:
 \example{After meeting with him}
 
 
+\subsection{Syntax}
 
+Syntax is the set of rules that govern the structure of sentences. Or, knowledge of syntax is what allows us to translate our amorphous ideas into a tree of phrases and then into a string of words. Consider.
+
+\example{In Sophocles' play, Oedipus marris his mother}
+
+This breaks down into,
+
+\Tree[.Clause
+    [.Prepositional\ Phrase
+        [.Preposition \textit{In} ]
+        [.Noun\ Phrase \textit{Sophocles' play} ]
+    ]
+    [.Clause
+        [.Noun\ Phrase \textit{Oedipus} ]
+        [.Verb\ Phrase \textit{married his mother} ]
+    ]
+]
+
+We could have broken this down into more detail (\textit{married his mother} is very followed by a noun phrase), but I think this gives the main idea.
 
 
 \section{Punctuation}
@@ -49,7 +76,7 @@ Prepositional Phrase:
 \subsection{Comma}
 
 Two main purposes:
-To separate parenthetical comments about a thing (action, event, state) from the words necessary to pin down the thing itself.
+First, to separate parenthetical comments about a thing (action, event, state), from the words necessary to pin down the thing itself. Second, to signal a break in pronounciation (sometimes called a prosodic break).
 
 
 To illustrate the first, compare:
