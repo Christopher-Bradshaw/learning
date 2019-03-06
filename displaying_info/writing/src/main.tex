@@ -3,6 +3,9 @@
 \usepackage{xcolor}
 \usepackage{qtree}
 
+\usepackage{natbib}
+\bibliographystyle{abbrvnat}
+
 % \newcommand{\hl}[1]{\colorbox{green}{#1}}
 \newcommand{\hl}[1]{\underline{#1}}
 \newcommand{\hlq}[1]{\colorbox{red}{#1}}
@@ -71,45 +74,6 @@ This breaks down into,
 We could have broken this down into more detail (\textit{married his mother} is very followed by a noun phrase), but I think this gives the main idea.
 
 
-\section{Ordering}
-
-There are many ways to say the same thing.
-\example{Bob flew the helicopter over the river},
-\example{The helicopter was flown by Bob over the river}
-These are two common ``voices'', active and passive. There are more.
-
-
-\subsection{Active vs Passive}
-
-In the active voice, sentences are ordered subject-verb-object.
-\example{I ate the pizza.}
-In the passive voice, the order becomes object-<to be>-verb-subject.
-\example{The pizza was eaten by me.}
-The subject no longer acts.
-
-In what cases might we want to use the passive?
-\begin{itemize}
-    \item We don't know (or care about) the subject. In the passive voice, the ``by-phrase'' can be omitted and so we can write \example{The man was pulled from the burning house} rather than \example{The fireman pulled the man\ldots}.
-    \item The object connects more readily with the previous sentence. Compare \example{I brought my lunch to work. It was made last night by my favourite indian restaurant.} with \example{I brought my lunch to work. My favourite indian restuarant made it last night}. After the first sentence, ``my lunch'' is on our minds. If there is anything new to be said about the food, we should begin by mentioning it. In the second example, the second sentence begins with the digression ``My favourite indian restaurant'', and only later connects it back the sentence before. This adds cognitive load.
-    % \item Relative clauses should generally be passive. \example{Among those at the meeting was Bob, the former helicopter pilot chosen by his boss Brian to represent him, and Tom}. \example{Among those at the meeting was Bob, the former helicopter pilot who was chosen by his book Brian to represent him, and Tom}
-\end{itemize}
-
-\subsection{Topic, then comment. Given, then new}
-
-People learn by integrating new information into their existing web of knowledge. If a fast is presented without any background or link to what came before, the reader will have to hold this fact in memory while waiting for context. Don't force them to do this! First present the context. Often the only way to do this is to use the passive voice (as English requires subject - verb ordering).
-
-
-
-\subsection{Light before Heavy}
-
-The US constitution says ``among these are life, liberty and the pursuit of happiness''. Why does this sound so much better than ``among these are the pursuit of happiness, liberty and life''?
-
-
-
-
-
-
-
 \section{Punctuation}
 
 \subsection{Comma}
@@ -145,6 +109,87 @@ While a comma that demarcates a syntactic break can be ommited when the pronunci
 \subsection{Colon}
 
 
+\section{Sentence level structures}
+
+There are many ways to say the same thing.
+\example{Bob flew the helicopter over the river},
+\example{The helicopter was flown by Bob over the river}
+These are two common ``voices'', active and passive. There are more.
+
+
+\subsection{Active vs Passive}
+
+In the active voice, sentences are ordered subject-verb-object.
+\example{I ate the pizza.}
+In the passive voice, the order becomes object-to be-past participle-subject.
+\example{The pizza was eaten by me.}
+The subject no longer acts.
+
+In what cases might we want to use the passive?
+\begin{itemize}
+    \item We don't know (or care about) the subject. In the passive voice, the ``by-phrase'' can be omitted and so we can write \example{The man was pulled from the burning house} rather than \example{The fireman pulled the man\ldots}.
+    \item The object connects more readily with the previous sentence. Compare \example{I brought my lunch to work. It was made last night by my favourite indian restaurant.} with \example{I brought my lunch to work. My favourite indian restuarant made it last night}. After the first sentence, ``my lunch'' is on our minds. If there is anything new to be said about the food, we should begin by mentioning it. In the second example, the second sentence begins with the digression ``My favourite indian restaurant'', and only later connects it back the sentence before. This adds cognitive load.
+    % \item Relative clauses should generally be passive. \example{Among those at the meeting was Bob, the former helicopter pilot chosen by his boss Brian to represent him, and Tom}. \example{Among those at the meeting was Bob, the former helicopter pilot who was chosen by his book Brian to represent him, and Tom}
+\end{itemize}
+
+\subsection{Topic, then comment. Given, then new}
+
+People learn by integrating new information into their existing web of knowledge. If a fast is presented without any background or link to what came before, the reader will have to hold this fact in memory while waiting for context. Don't force them to do this! First present the context. Often the only way to do this is to use the passive voice (as English requires subject - verb ordering).
+
+\example{First present the context. Often the only way to do this is to use the passive voice (as English requires subject - verb ordering).}
+
+\example{First present the context. As English requires subject - verb ordering, often the only way to do this is to use the passive voice.}
+
+\subsection{Light before Heavy}
+
+The US constitution says \example{among these are life, liberty and the pursuit of happiness}. Why does this sound so much better than \example{among these are the pursuit of happiness, liberty and life}?
+
+The principle behind this is that the reader can best handle a heavier phrase at the end once they have already done the work to understand the overarching structure.
+Putting the heavy phrase first makes the understanding the structure harder.
+
+\example{He ran away from the cats, frogs, and long legged spiders}
+\example{He ran away from the long-legged spiders, cats, and frogs}
+
+\section{Paragraph level structures}
+
+See \citet[chapter 5][]{Pinker2014}.
+
+\subsection{Don't bury the lede}
+
+In the same spirit as ``Topic, then comment'', people find it much easier to understand where the argument is going if they know where the argument is going! See \cite{Bransford1972}. The short summary is that recall of a passage doubled when the readers were given a sentence long description of the topic at the start. Getting the topic at the end didn't help at all.
+
+Don't worry that it appears unsubtle to you to declare openly at the start, ``This section is about X''. Your audience, who have not read this before and haven't been thinking through the argument for the last year, will appreciate having this context when they read it. This is especially true because the argument is likely not exhaustively stepped through. There will be small gaps, and knowing where you are going will help the reader jump them.
+
+
+\subsection{Introducing characters}
+
+It is important to distinguish between new characters and the return of old characters.
+\example{Bob died in a helicopter crash and his relative \ldots}
+His refers back to Bob, but the sentence would sound very weird if we replaced it with ``Bob's''.
+However, if other characters have appears since we last talked about Bob, or it has been a while, it might not be obvious who the pronoun refers to.
+
+Another way to identify characters is by using the definite article \textit{the}\/ and the indefinite article \textit{a}\/. For example,
+\example{A helicopter pilot walks into a bar. The helicopter pilot rubs his now sore head.}
+The indefinite article shows that the character is new. The definite article refers back to the one we have already met.
+
+\subsection{Variation vs Consistency}
+
+In some cases, repetition sounds wrong.
+\example{Bob and Bob's relative \ldots}
+When it is clear you should use pronouns. This let's the reader know that this character is someone they have encountered before.
+
+Sometimes a pronoun is not clear. Would replacing ``The birds'' with ``They'' be clear here?
+\example{The sparrows pecked at the seeds. The birds love my new bird-feeder}
+In that case you can use a pseudo-pronoun: a more general form of the original noun that immediately calls to mind the first one.
+
+These variations were for good reasons. Don't vary terminology capriciously as it can cost understanding or just sound silly itself. In particular, when connecting two things you should definitely not vary the temrinology as the connection can become less clear. Compare,
+
+
+\subsection{Relating sentences}
+
+Resemblance, contiguity in time or place, cause and effect.
+
+\bibliography{main}
 \end{document}
 
 
