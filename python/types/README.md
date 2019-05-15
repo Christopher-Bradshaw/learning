@@ -42,3 +42,5 @@ What are the valid options for the types?
 * A class (e.g. `int`, `UserID`)
 * An alias for a class (e.g. `typing.List`, or user define `Name = str`)
 * A special type from the typing module (e.g. `Any`, `Callable`)
+
+Note that while most of the standard library has these annotations (not necessarily in the source, they can also be defined in extension files), many libraries that I really care about (numpy) do not. So the utility of type checking is drastically reduced...

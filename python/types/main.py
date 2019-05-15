@@ -15,6 +15,7 @@ print(add("hello ", "world!")) # happily prints 'hello world!'
 
 # If we really want to enforce it, we can using external libraries
 # Though there may be a preformance penalty to this
+# Also note that mypy doesn't check this!
 @typechecked
 def minus(x: int, y: int) -> int:
     return x - y
