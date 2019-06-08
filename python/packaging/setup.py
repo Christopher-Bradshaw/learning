@@ -1,4 +1,6 @@
-from setuptools import setup
+from setuptools import setup, Extension
+from Cython.Build import cythonize
+
 
 setup(
         # Bare bones
@@ -12,4 +14,11 @@ setup(
         url="example.com",
         # Dependencies
         install_requires=["numpy", "scipy>=1.2"],
+        # Extension modules that require compilation
+        ext_modules=cythonize(
+            Extension(
+                name="my_library.fast_code",
+                sources=["my_library/fast_code.pyx"]
+            )
+        )
 )

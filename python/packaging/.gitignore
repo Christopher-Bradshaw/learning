@@ -1,0 +1,3 @@
+build
+my_library.egg-info
+my_library/fast_code.c*
