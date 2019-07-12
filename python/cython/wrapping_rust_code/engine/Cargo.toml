@@ -1,0 +1,11 @@
+[package]
+name = "engine"
+version = "0.1.0"
+authors = ["Christopher Bradshaw <christopher.peter.bradshaw+github@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "engine"
+crate-type = ["dylib"]
+
+[dependencies]
