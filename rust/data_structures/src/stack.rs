@@ -9,11 +9,12 @@ struct Node<T> {
 
 pub struct Stack<T> {
     head: More<T>,
+    len: i32,
 }
 
 impl<T> Stack<T> {
     pub fn new() -> Stack<T> {
-        Stack { head: None }
+        Stack { head: None, len: 0 }
     }
 
     // We pass a reference to the stack - we borrow the stack (don't take ownership)
@@ -23,6 +24,7 @@ impl<T> Stack<T> {
             next: self.head.take(),
             val: val,
         }));
+        self.len += 1;
     }
 
     pub fn pop(&mut self) -> Option<T> {
@@ -30,6 +32,7 @@ impl<T> Stack<T> {
             None => None,
             Some(v) => {
                 self.head = v.next;
+                self.len -= 1;
                 Some(v.val)
             }
         }
@@ -48,14 +51,19 @@ mod test {
 
         // Both push and pop just borrow the stack. So it is still owned in this function.
         // They mutate it though.
+        assert_eq!(s.len, 0);
         assert_eq!(s.pop(), None);
+        assert_eq!(s.len, 0);
 
         s.push(1);
+        assert_eq!(s.len, 1);
         assert_eq!(s.pop(), Some(1));
+        assert_eq!(s.len, 0);
         assert_eq!(s.pop(), None);
 
         s.push(1);
         s.push(2);
+        assert_eq!(s.len, 2);
         assert_eq!(s.pop(), Some(2));
         assert_eq!(s.pop(), Some(1));
         assert_eq!(s.pop(), None);
