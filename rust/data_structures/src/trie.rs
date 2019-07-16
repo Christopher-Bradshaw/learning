@@ -23,31 +23,29 @@ where
     pub fn insert(&mut self, key: String, val: T) {
         let (nxt, rst) = nxt_rst(key);
 
-        if !self.next.contains_key(&nxt) {
-            self.next.insert(nxt, Trie::new());
-        }
-
-        if rst == "".to_string() {
-            self.val = Some(val);
-        } else {
-            self.next
-                .get_mut(&nxt)
-                .unwrap()
-                .insert(rst.to_string(), val);
-        }
+        match nxt {
+            None => self.val = Some(val),
+            Some(v) => {
+                // Create node if necessary
+                if !self.next.contains_key(&v) {
+                    self.next.insert(v, Trie::new());
+                }
+                // Insert the rest into that node
+                self.next.get_mut(&v).unwrap().insert(rst, val);
+            }
+        };
     }
 
     pub fn find(&self, key: String) -> Option<T> {
         let (nxt, rst) = nxt_rst(key);
 
-        if rst == "".to_string() {
-            return self.val;
+        match nxt {
+            None => self.val,
+            Some(v) => match self.next.get(&v) {
+                None => None,
+                Some(v) => v.find(rst),
+            },
         }
-
-        return match self.next.get(&nxt) {
-            Some(v) => v.find(rst),
-            None => None,
-        };
     }
 
     pub fn keys(&self) {
@@ -57,11 +55,12 @@ where
     }
 }
 
-fn nxt_rst(s: String) -> (char, String) {
-    let (nxt, rst) = (&s[0..1], &s[1..]);
-    let nxt = nxt.chars().next().unwrap();
-
-    (nxt, rst.to_string())
+fn nxt_rst(s: String) -> (Option<char>, String) {
+    if s.len() == 0 {
+        return (None, String::from(""));
+    } else {
+        return (s[0..1].chars().next(), String::from(&s[1..]));
+    }
 }
 
 #[cfg(test)]
@@ -69,31 +68,41 @@ mod test {
     use crate::trie::Trie;
 
     #[test]
+    fn printable() {
+        let mut t = Trie::new();
+        t.insert(String::from("b"), 1);
+        t.insert(String::from("v"), 2);
+
+        println!("{}", t.find(String::from("b")).unwrap());
+        println!("{:?}", t);
+    }
+
+    #[test]
     fn basic_functionality_ints() {
         let mut t = Trie::new();
 
-        t.insert("bear".to_string(), 1);
-        t.insert("beat".to_string(), 1);
-        t.insert("pear".to_string(), 2);
+        t.insert(String::from("bear"), 1);
+        t.insert(String::from("beat"), 2);
+        t.insert(String::from("pear"), 3);
 
-        assert_eq!(t.find("bear".to_string()).unwrap(), 1);
-        assert_eq!(t.find("beat".to_string()).unwrap(), 1);
-        assert_eq!(t.find("pear".to_string()).unwrap(), 2);
+        assert_eq!(t.find(String::from("bear")).unwrap(), 1);
+        assert_eq!(t.find(String::from("beat")).unwrap(), 2);
+        assert_eq!(t.find(String::from("pear")).unwrap(), 3);
 
-        assert_eq!(t.find("bears".to_string()), None);
-        assert_eq!(t.find("bea".to_string()), None);
+        assert_eq!(t.find(String::from("bears")), None);
+        assert_eq!(t.find(String::from("bea")), None);
     }
 
     #[test]
     fn basic_functionality_floats() {
         let mut t = Trie::new();
 
-        t.insert("bear".to_string(), 1.);
-        t.insert("pear".to_string(), 2.);
+        t.insert(String::from("bear"), 1.);
+        t.insert(String::from("pear"), 2.);
 
-        assert_eq!(t.find("bear".to_string()).unwrap(), 1.);
-        assert_eq!(t.find("pear".to_string()).unwrap(), 2.);
-        assert_eq!(t.find("bears".to_string()), None);
-        assert_eq!(t.find("bea".to_string()), None);
+        assert_eq!(t.find(String::from("bear")).unwrap(), 1.);
+        assert_eq!(t.find(String::from("pear")).unwrap(), 2.);
+        assert_eq!(t.find(String::from("bears")), None);
+        assert_eq!(t.find(String::from("bea")), None);
     }
 }
