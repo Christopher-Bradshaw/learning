@@ -11,10 +11,22 @@ Find all the docs using `rustup docs`. These include the book, std library docs,
 
 The rust build/dependency system. Useful commands,
 
-* cargo new: create a new project (with cargo.toml + src/main.rs)
-* cargo build: build
-* cargo check: check if it can be built (often a lot faster than actually building)
-* cargo run: build and run
+* `cargo new`: Create a new project (with cargo.toml + src/main.rs)
+* `cargo build`: Build
+* `cargo check`: Check if it can be built (often a lot faster than actually building)
+* `cargo run`: Build and run
+* `cargo test <search_pattern>`: Run all tests (that match the optional pattern). Add `-- --nocapture` to see stdout.
+
+## New Language Features
+
+### Traits
+
+A collection of methods for some unknown type. E.g. you can define a `trait Animal` that can `fn talk(&self)` and `fn name(&self)` (with optional default implementation).
+Methods defined in the same trait can access other methods in that trait (e.g. the `Animal.talk` can hit `Animal.name`).
+A data type (e.g. `Sheep`) can then implement a trait by implementing these methods in a `impl Animal for Sheep` block.
+See [here](https://doc.rust-lang.org/rust-by-example/trait.html) for this full example.
+
+For a more practicle, but very simple, use of traits, checkout out [Deref](https://doc.rust-lang.org/std/ops/trait.Deref.html)
 
 ## Simple Language features
 
