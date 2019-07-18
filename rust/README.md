@@ -48,9 +48,12 @@ Two rules:
 * Each **value** has a single **variable** that is its owner
 * Once the owner goes out of scope, the memory for that value can be freed.
 
+A third rule?
+* Only one mutable borrow
+
 ### Scope
 
-It looks like rust is block scoped
+It looks like rust is block scoped.
 
 ### GC
 

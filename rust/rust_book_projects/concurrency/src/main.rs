@@ -1,9 +1,14 @@
 use std::thread;
 use std::time::Duration;
 
+mod mutexes;
+
 fn main() {
     basic_threads();
     threads_with_ownership();
+
+    mutexes::basic_mutexes();
+    mutexes::shared_mutex();
 }
 
 fn basic_threads() {
