@@ -6,6 +6,7 @@ Find all the docs using `rustup docs`. These include the book, std library docs,
 * Continue reading the book
 * Read some good code (something in https://github.com/rust-lang (rustlings, rls), ripgrep)?
 * interop with python?
+* Check https://arveknudsen.com/posts/practical-networked-applications-in-rust/module-1/
 
 ## Cargo
 
