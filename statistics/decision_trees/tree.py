@@ -1,11 +1,12 @@
 import numpy as np
-import scipy.optimize
+import scipy.optimize, scipy.stats
 
 
 class DecisionTree:
-    eps = 1e-3
+    eps = 1e-6
 
-    def __init__(self):
+    def __init__(self, max_depth=None, min_in_leaf=None, cut_dim="best", _depth=1):
+        assert cut_dim in ["best", "random", "random_best"]
         self.n_features = None
         self.n_classes = None
 
@@ -19,6 +20,19 @@ class DecisionTree:
         self.right = None
 
         self.leaf_value = None
+        self.depth = _depth
+        self.max_depth = max_depth
+        self.cut_dim = cut_dim
+        self.min_in_leaf = min_in_leaf
+        self.random_best_n = lambda: int(np.sqrt(self.n_features)) + 1
+
+    def _child_tree(self):
+        return DecisionTree(
+            max_depth=self.max_depth,
+            cut_dim=self.cut_dim,
+            min_in_leaf=self.min_in_leaf,
+            _depth=self.depth + 1,
+        )
 
     def predict(self, testX):
         assert testX.shape[1] == self.n_features
@@ -43,15 +57,18 @@ class DecisionTree:
         self.trainY = trainY
 
         if self.n_classes == 1:
-            self.leaf_value = trainY[0]
+            self.leaf_value = self.trainY[0]
+            return
+        elif self.depth == self.max_depth or len(self.trainY) == self.min_in_leaf:
+            self.leaf_value = scipy.stats.mode(self.trainY)[0][0]
             return
 
         self.class_to_cut, self.cut_val = self._find_cut()
 
-        self.left = DecisionTree()
+        self.left = self._child_tree()
         in_left_tree = self.trainX[:, self.class_to_cut] < self.cut_val
         self.left.fit(self.trainX[in_left_tree], self.trainY[in_left_tree])
-        self.right = DecisionTree()
+        self.right = self._child_tree()
         in_right_tree = np.logical_not(in_left_tree)
         self.right.fit(self.trainX[in_right_tree], self.trainY[in_right_tree])
 
@@ -70,7 +87,17 @@ class DecisionTree:
                 finish=None,
             )
             G_scores[i] = (G_score, best_cut)
-        class_to_cut = np.argmin(G_scores["score"])
+        if self.cut_dim == "best":
+            class_to_cut = np.argmin(G_scores["score"])
+        elif self.cut_dim == "random":
+            class_to_cut = np.random.choice(self.n_features)
+        elif self.cut_dim == "random_best":
+            class_to_cut = np.random.choice(
+                np.argsort(G_scores["score"])[: self.random_best_n()]
+            )
+        else:
+            raise Exception(f"Unknown cut_dim: {self.cut_dim}")
+
         return class_to_cut, G_scores["cut"][class_to_cut]
 
     def _compute_negative_gini_gain(self, cut, x, y):
