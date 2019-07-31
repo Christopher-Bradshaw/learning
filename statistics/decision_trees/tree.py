@@ -3,7 +3,7 @@ import scipy.optimize
 
 
 class DecisionTree:
-    eps = 1e-9
+    eps = 1e-3
 
     def __init__(self):
         self.n_features = None
@@ -63,32 +63,27 @@ class DecisionTree:
             x = self.trainX[:, i]
             y = self.trainY
             best_cut, G_score, _, _ = scipy.optimize.brute(
-                self._compute_gini_impurity,
+                self._compute_negative_gini_gain,
                 ranges=[(np.min(x) + self.eps, np.max(x) - self.eps)],
                 args=(x, y),
                 full_output=True,
+                finish=None,
             )
             G_scores[i] = (G_score, best_cut)
         class_to_cut = np.argmin(G_scores["score"])
         return class_to_cut, G_scores["cut"][class_to_cut]
 
-    def _compute_gini_impurity(self, cut, x, y):
+    def _compute_negative_gini_gain(self, cut, x, y):
         assert len(x.shape) == 1 and len(y.shape) == 1
         assert np.min(x) < cut < np.max(x)
         below_cut = x < cut
-        G = np.array(
-            [
-                self._compute_one_side_gini(y[below_cut]),
-                self._compute_one_side_gini(y[np.logical_not(below_cut)]),
-            ]
-        )
-        G *= len(y)
-        G /= np.array(
-            [np.count_nonzero(below_cut), np.count_nonzero(np.logical_not(below_cut))]
-        )
-        return np.sum(G)
+        above_cut = np.logical_not(below_cut)
+        G_before = self._compute_gini_impurity(y)
+        G_l = np.count_nonzero(below_cut) * self._compute_gini_impurity(y[below_cut])
+        G_r = np.count_nonzero(above_cut) * self._compute_gini_impurity(y[above_cut])
+        return -(G_before - (G_l + G_r) / len(y))
 
-    def _compute_one_side_gini(self, y):
+    def _compute_gini_impurity(self, y):
         _, counts = np.unique(y, return_counts=True)
         G = 0
         for c in counts:
