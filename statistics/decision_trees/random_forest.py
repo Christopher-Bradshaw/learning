@@ -5,13 +5,13 @@ from tree import DecisionTree
 
 
 class RandomForest:
-    def __init__(self, n_trees, n_cores=1, tree_config=None):
+    def __init__(self, n_trees, tree_config=None):
 
+        # By default we want some randomness in the trees
         default_tree_config = dict(cut_dim="random_best")
-        tree_config = {**(tree_config or {}), **default_tree_config}
+        tree_config = {**default_tree_config, **(tree_config or {})}
 
         self.trees = [DecisionTree(**tree_config) for i in range(n_trees)]
-        self.n_cores = n_cores
 
     def fit(self, trainX, trainY):
         for t in self.trees:
