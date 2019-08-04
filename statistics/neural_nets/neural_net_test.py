@@ -27,7 +27,6 @@ class TestNeuralNet:
         assert np.array_equal(pred, [3, 0])
 
         nn.compute_loss(pred, y)
-        # breakpoint()
         dL_dx = nn.backward()
 
         # |0 -1  2| |0 + dx1|   | 3 + 0    -  dx2 + 2dx3|   | 3 + ...|    |3 - dx2 + 2dx3|
@@ -36,3 +35,24 @@ class TestNeuralNet:
         # MSE loss results in 2( ... ) so dL = -2dx2 + 4dx3, dL/dx = |0, -2, 4|
 
         assert np.array_equal(dL_dx, [0, -2, 4])
+
+    def test_neural_net_tends_to_correct(self):
+        n_in, n_out = 4, 2
+
+        np.random.seed(12)
+        weights = np.random.normal(size=(n_out, n_in))
+        bias = np.zeros(n_out)
+
+        nn = NeuralNet(
+            MeanSquaredError(), 1e-2, layers=[Linear(n_in, 2, weights, bias)]
+        )
+
+        x = np.array([-1, 0.5, -0.33, 0.75])
+        y = np.array([-0.5, 0.2])
+
+        for _ in range(1000):
+            pred = nn.forward(x)
+            loss = nn.compute_loss(pred, y)
+            nn.backward()
+
+        assert np.isclose(loss, 0)
