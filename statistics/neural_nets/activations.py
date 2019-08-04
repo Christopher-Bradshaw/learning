@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class ReLU:
     def __init__(self):
         self.d_out_d_in = None
@@ -11,7 +12,6 @@ class ReLU:
     def _compute_d_out_d_in(self, x):
         self.d_out_d_in = np.zeros_like(x)
         self.d_out_d_in[x > 0] = 1
-
 
     def backward(self, d_loss_d_out):
         """

@@ -2,6 +2,7 @@ import numpy as np
 
 from activations import ReLU
 
+
 class TestReLU:
     def test_forward(self):
         x = np.random.random(100)

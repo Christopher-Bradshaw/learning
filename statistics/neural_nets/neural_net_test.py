@@ -5,6 +5,7 @@ from activations import ReLU
 from linear import Linear
 from loss import MeanSquaredError
 
+
 class TestNeuralNet:
     def test_neural_net(self):
         n_in, n_out = 3, 2
@@ -13,9 +14,7 @@ class TestNeuralNet:
         bias = np.arange(n_out)
 
         nn = NeuralNet(
-                MeanSquaredError(),
-                Linear(n_in, 2, weights, bias),
-                ReLU(),
+            MeanSquaredError(), 1e-3, layers=[Linear(n_in, 2, weights, bias), ReLU()]
         )
         x = np.arange(n_in)
         y = np.array([2, 3])
@@ -36,4 +35,4 @@ class TestNeuralNet:
         #           |2 + dx3| The second component is ReLU'ed away
         # MSE loss results in 2( ... ) so dL = -2dx2 + 4dx3, dL/dx = |0, -2, 4|
 
-        assert np.array_equal(dL_dx, [0,-2, 4])
+        assert np.array_equal(dL_dx, [0, -2, 4])

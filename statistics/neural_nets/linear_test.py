@@ -2,13 +2,14 @@ import numpy as np
 
 from linear import Linear
 
+
 class TestLinear:
     def test_forward(self):
 
         n_in, n_out = 3, 2
 
         bias = np.arange(n_out)
-        weights = np.arange(n_in*n_out).reshape((n_out, n_in))
+        weights = np.arange(n_in * n_out).reshape((n_out, n_in))
 
         layer = Linear(n_in, n_out, weights, bias)
         x = np.arange(n_in)

@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class MeanSquaredError:
     def __init__(self):
         self.d_out_d_in = None
