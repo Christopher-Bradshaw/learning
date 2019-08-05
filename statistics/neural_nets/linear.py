@@ -13,7 +13,7 @@ class Linear:
         )
 
         assert self.weights.shape == (n_out, n_in)
-        assert self.bias.shape == (n_out,)
+        assert self.bias.shape == (n_out, 1)
 
         self.last_x = None
 
@@ -55,7 +55,9 @@ class Linear:
         back = np.matmul(self.d_out_d_in.T, d_loss_d_out)
 
         # Update the weights
-        d_out_d_weights = d_loss_d_out[:, np.newaxis] * self.last_x[np.newaxis, :]
+        d_out_d_weights = np.matmul(d_loss_d_out, np.rollaxis(self.last_x, 2, 1))
+        d_out_d_weights = np.mean(d_out_d_weights, axis=0)
+        # For batch sizes larger than 1 you will need an average here.
         self.weights -= self.learning_rate * d_out_d_weights
 
         return back

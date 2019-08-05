@@ -1,4 +1,16 @@
-# Backprop
+# Neural Net
+
+A simple implementation of a NN. Currently can only do fully connected layers, with ReLU actuvation and mean squared error loss.
+
+## TODO
+
+allow training in batches
+
+## Backprop
+
+Backprop is implemented manually (i.e. each type of layer needs to describe how to compute gradients). I did this rather than use some sort of autograd to force me to think about how backprop works...
+
+### Backprop notes
 
 Let's say we have a network made up of layers (l1, l2, ..., ln) each of which map xi = li(xi-1), for example x1 = l1(x0) -> the output from the first layer.
 Note that all of these xn are vectors of some (potentially varying between layers) size.

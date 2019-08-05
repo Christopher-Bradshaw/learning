@@ -5,6 +5,10 @@ class NeuralNet:
         self.set_learning_rates(learning_rate)
 
     def forward(self, x):
+        """
+        x needs to be a list of 2d arrays
+        """
+        assert len(x.shape) == 3
         for l in self.layers:
             x = l.forward(x)
         return x
