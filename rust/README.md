@@ -70,3 +70,40 @@ let mut s2 = s1;
 ```
 
 Who owns the memory?
+
+## Debugging
+
+Rust makes writing and running tests very easy. But what do you do when you can't work out why a specific test, let's call it `failing_test`, keeps failing?
+
+When running tests you will see something like,
+```
+(ins)s:some_lib $ cargo test
+    Finished dev [unoptimized + debuginfo] target(s) in 0.01s
+     Running target/debug/deps/some_lib-04c82099363c591d
+
+     ...
+failures:
+    some_file::test::failing_test
+```
+
+The file in the *Running* line is the binary that cargo has created to run the tests. We can re-run these tests, optionally selecting only a single test, with,
+
+```
+(ins)s:some_lib $ ./target/debug/deps/some_lib-04c82099363c591d [--test failing_test]
+```
+
+But because we have a standalone binary, we can also run them using our favourite debugging utility,
+
+```
+(ins)s:some_lib $ gdb
+    ...
+@(gdb) run --test failing_test
+```
+
+Before running, we can include a breakpoint wherever rust panics,
+```
+@(gdb) break rust_panic
+Breakpoint 1 at 0x5555555c1683: file src/libstd/panicking.rs, line 523.
+@(gdb) run
+```
+
