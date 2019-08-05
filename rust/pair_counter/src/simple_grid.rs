@@ -7,7 +7,7 @@ pub fn simple_grid(
     y2: Option<&[f32]>,
     bins: &[f32],
     box_size: f32,
-) -> Vec<i32> {
+) -> Vec<u32> {
     checks::all_checks(x1, y1, x2, y2, bins, box_size);
     checks::grid_checks(bins, box_size);
 
@@ -27,7 +27,7 @@ pub fn simple_grid(
 
     // Do counts
     let is_autocorr = common::is_autocorr(x2);
-    let mut counts: Vec<i32> = vec![0; bins.len() - 1];
+    let mut counts: Vec<u32> = vec![0; bins.len() - 1];
 
     for i in 0..n_gridbox {
         for j in 0..n_gridbox {
@@ -44,9 +44,9 @@ fn do_counts(
     bins: &[f32],
     box_size: f32,
     is_autocorr: bool,
-) -> Vec<i32> {
+) -> Vec<u32> {
     println!("{}", is_autocorr);
-    let mut counts: Vec<i32> = vec![0; bins.len() - 1];
+    let mut counts: Vec<u32> = vec![0; bins.len() - 1];
     let grid_item = &grid[x_index as usize][y_index as usize];
 
     for [inner_x_index, inner_y_index] in grid_item.owned_neighbors(is_autocorr).iter() {
@@ -82,7 +82,7 @@ fn do_counts(
     counts
 }
 
-fn sum_vec(mut a: Vec<i32>, b: Vec<i32>) -> Vec<i32> {
+fn sum_vec(mut a: Vec<u32>, b: Vec<u32>) -> Vec<u32> {
     for i in 0..b.len() {
         a[i] += b[i];
     }

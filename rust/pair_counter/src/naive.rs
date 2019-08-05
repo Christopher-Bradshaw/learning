@@ -7,7 +7,7 @@ pub fn naive(
     y2: Option<&[f32]>,
     bins: &[f32],
     box_size: f32,
-) -> Vec<i32> {
+) -> Vec<u32> {
     checks::all_checks(x1, y1, x2, y2, bins, box_size);
 
     return match common::is_autocorr(x2) {
@@ -22,8 +22,8 @@ fn count_pairs_crosscorr(
     y2: &[f32],
     bins: &[f32],
     box_size: f32,
-) -> Vec<i32> {
-    let mut counts: Vec<i32> = vec![0; bins.len() - 1];
+) -> Vec<u32> {
+    let mut counts: Vec<u32> = vec![0; bins.len() - 1];
     let mut dist;
 
     for i in 0..x1.len() {
@@ -43,8 +43,8 @@ fn count_pairs_crosscorr(
     counts
 }
 
-fn count_pairs_autocorr(x1: &[f32], y1: &[f32], bins: &[f32], box_size: f32) -> Vec<i32> {
-    let mut counts: Vec<i32> = vec![0; bins.len() - 1];
+fn count_pairs_autocorr(x1: &[f32], y1: &[f32], bins: &[f32], box_size: f32) -> Vec<u32> {
+    let mut counts: Vec<u32> = vec![0; bins.len() - 1];
     let mut dist;
 
     for i in 0..x1.len() {

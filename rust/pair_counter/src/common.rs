@@ -24,8 +24,8 @@ pub fn count_pairs_crosscorr(
     y2: &[f32],
     bins: &[f32],
     box_size: f32,
-) -> Vec<i32> {
-    let mut counts: Vec<i32> = vec![0; bins.len() - 1];
+) -> Vec<u32> {
+    let mut counts: Vec<u32> = vec![0; bins.len() - 1];
     let mut dist;
 
     for i in 0..x1.len() {
@@ -40,8 +40,8 @@ pub fn count_pairs_crosscorr(
     counts
 }
 
-pub fn count_pairs_autocorr(x1: &[f32], y1: &[f32], bins: &[f32], box_size: f32) -> Vec<i32> {
-    let mut counts: Vec<i32> = vec![0; bins.len() - 1];
+pub fn count_pairs_autocorr(x1: &[f32], y1: &[f32], bins: &[f32], box_size: f32) -> Vec<u32> {
+    let mut counts: Vec<u32> = vec![0; bins.len() - 1];
     let mut dist;
 
     for i in 0..x1.len() {
