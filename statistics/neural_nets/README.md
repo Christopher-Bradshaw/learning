@@ -4,7 +4,9 @@ A simple implementation of a NN. Currently can only do fully connected layers, w
 
 ## TODO
 
-allow training in batches
+Batch normalization
+Demo a simple use case
+Convolutions?
 
 ## Backprop
 

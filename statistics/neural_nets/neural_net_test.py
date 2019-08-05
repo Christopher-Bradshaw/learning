@@ -72,6 +72,7 @@ class TestNeuralNet:
         x = np.array([[[-1], [0.5]], [[1], [-0.2]], [[-0.33], [0.75]]])
         y = x
 
+        # Why does this take so much longer to converge than the previous one?
         for _ in range(10000):
             pred = nn.forward(x)
             loss = nn.compute_loss(pred, y)
