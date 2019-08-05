@@ -5,6 +5,7 @@ A simple implementation of a NN. Currently can only do fully connected layers, w
 ## TODO
 
 Batch normalization
+test/train state
 Demo a simple use case
 Convolutions?
 
