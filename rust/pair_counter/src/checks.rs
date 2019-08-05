@@ -24,7 +24,7 @@ pub fn all_checks(
     assert_eq!(x2.len(), y2.len(), "X and Y should be the same length");
     for d in [x1, y1, x2, y2].iter() {
         for i in 0..d.len() {
-            assert!(d[i] < box_size);
+            assert!(d[i] >= 0. && d[i] < box_size);
         }
     }
     for i in 1..bins.len() {

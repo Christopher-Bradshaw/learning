@@ -5,6 +5,18 @@ pub fn is_autocorr(x2: Option<&[f32]>) -> bool {
     }
 }
 
+fn get_bin_idx(dist: f32, bins: &[f32]) -> Option<usize> {
+    if dist < bins[0] {
+        return None;
+    }
+    for i in 1..bins.len() {
+        if dist < bins[i] {
+            return Some(i - 1);
+        }
+    }
+    return None;
+}
+
 pub fn count_pairs_crosscorr(
     x1: &[f32],
     y1: &[f32],
@@ -19,14 +31,9 @@ pub fn count_pairs_crosscorr(
     for i in 0..x1.len() {
         for j in 0..x2.len() {
             dist = compute_distance_with_pbc(x1[i], y1[i], x2[j], y2[j], box_size);
-            if dist < bins[0] {
-                continue;
-            }
-            for k in 1..bins.len() {
-                if dist < bins[k] {
-                    counts[k - 1] += 1;
-                    break;
-                }
+            match get_bin_idx(dist, bins) {
+                Some(idx) => counts[idx] += 1,
+                None => (),
             }
         }
     }
@@ -40,14 +47,9 @@ pub fn count_pairs_autocorr(x1: &[f32], y1: &[f32], bins: &[f32], box_size: f32)
     for i in 0..x1.len() {
         for j in (i + 1)..x1.len() {
             dist = compute_distance_with_pbc(x1[i], y1[i], x1[j], y1[j], box_size);
-            if dist < bins[0] {
-                continue;
-            }
-            for k in 1..bins.len() {
-                if dist < bins[k] {
-                    counts[k - 1] += 1;
-                    break;
-                }
+            match get_bin_idx(dist, bins) {
+                Some(idx) => counts[idx] += 1,
+                None => (),
             }
         }
     }
