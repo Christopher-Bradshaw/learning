@@ -54,6 +54,8 @@ fn do_counts(
 
     for [inner_x_index, inner_y_index] in grid_item.owned_neighbors(is_autocorr).iter() {
         let pair_box = &grid[*inner_x_index as usize][*inner_y_index as usize];
+        let needs_pbc = (*inner_x_index as i64 - x_index as i64).abs() > 1
+            || (*inner_y_index as i64 - y_index as i64).abs() > 1;
         let sub_counts = match is_autocorr {
             // If crosscorr -> always do crosscorr
             false => common::count_pairs_crosscorr(
@@ -63,10 +65,11 @@ fn do_counts(
                 &pair_box.y2,
                 bins,
                 box_size,
+                needs_pbc,
             ),
             // If autocorr, do autocorr if between the same mini-bin, else do cross corr
             true => match *inner_x_index == x_index as u32 && *inner_y_index == y_index as u32 {
-                true => common::count_pairs_autocorr(&grid_item.x1, &grid_item.y1, bins, box_size),
+                true => common::count_pairs_autocorr(&grid_item.x1, &grid_item.y1, bins),
                 false => common::count_pairs_crosscorr(
                     &grid_item.x1,
                     &grid_item.y1,
@@ -74,6 +77,7 @@ fn do_counts(
                     &pair_box.y1,
                     bins,
                     box_size,
+                    needs_pbc,
                 ),
             },
         };

@@ -22,30 +22,40 @@ pub fn count_pairs_crosscorr(
     y2: &[f32],
     bins: &[f32],
     box_size: f32,
+    needs_pbc: bool,
 ) -> Vec<u32> {
     let mut counts: Vec<u32> = vec![0; bins.len() + 1];
     let mut dist;
 
     for i in 0..x1.len() {
         for j in 0..x2.len() {
-            dist = compute_distance_with_pbc(x1[i], y1[i], x2[j], y2[j], box_size);
+            if needs_pbc {
+                dist = compute_distance_with_pbc(x1[i], y1[i], x2[j], y2[j], box_size);
+            } else {
+                dist = compute_distance(x1[i], y1[i], x2[j], y2[j]);
+            }
             counts[get_bin_idx(dist, bins)] += 1;
         }
     }
     counts
 }
 
-pub fn count_pairs_autocorr(x1: &[f32], y1: &[f32], bins: &[f32], box_size: f32) -> Vec<u32> {
+pub fn count_pairs_autocorr(x1: &[f32], y1: &[f32], bins: &[f32]) -> Vec<u32> {
     let mut counts: Vec<u32> = vec![0; bins.len() + 1];
     let mut dist;
 
     for i in 0..x1.len() {
         for j in (i + 1)..x1.len() {
-            dist = compute_distance_with_pbc(x1[i], y1[i], x1[j], y1[j], box_size);
+            dist = compute_distance(x1[i], y1[i], x1[j], y1[j]);
             counts[get_bin_idx(dist, bins)] += 1;
         }
     }
     counts
+}
+
+// If we know we don't need pbc, this is much faster
+fn compute_distance(x1: f32, y1: f32, x2: f32, y2: f32) -> f32 {
+    ((x1 - x2).powf(2.0) + (y1 - y2).powf(2.0)).sqrt()
 }
 
 fn compute_distance_with_pbc(x1: f32, y1: f32, x2: f32, y2: f32, box_size: f32) -> f32 {
