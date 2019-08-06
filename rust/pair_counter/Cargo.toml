@@ -9,6 +9,7 @@ edition = "2018"
 [dependencies]
 rand = "0.7.0"
 ord_subset = "3"
+statistical = "1"
 
 # The benchmarking profile, used for `cargo bench` (and the test targets and
 # unit tests for `cargo test --release`).
