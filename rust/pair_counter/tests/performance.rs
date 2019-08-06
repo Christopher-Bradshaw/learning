@@ -16,14 +16,18 @@ fn gen_data(n_items: usize, box_size: f32) -> Vec<f32> {
 }
 
 // npts: time (ms)
-// 8e3: 660
+// 10e3: 950
 // 16e3: 2100
 // 32e3: 7500
+// On release - only a factor of 5ish worse!
+// 5e4: 500
+// 1e5: 2000
 #[test]
 fn simple_grid_perf() {
     // These choices are taken to roughly match https://gist.github.com/manodeep/cffd9a5d77510e43ccf0
+    // Remember to test with `cargo test --release` to get full optimizations
     let box_size = 420.;
-    let n_items: usize = 16000;
+    let n_items: usize = 200000;
     let mut bins = vec![
         0.001, 0.0015, 0.0023, 0.0036, 0.0056, 0.0087, 0.013, 0.020, 0.032, 0.05,
     ];

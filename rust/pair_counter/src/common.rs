@@ -8,6 +8,7 @@ pub fn is_autocorr(x2: Option<&[f32]>) -> bool {
     }
 }
 
+// This is really slow. Something like https://arxiv.org/pdf/1506.08620.pdf could send it to ~0
 fn get_bin_idx(dist: f32, bins: &[f32]) -> usize {
     return match bins.ord_subset_binary_search(&dist) {
         Err(idx) => idx,
