@@ -1,4 +1,5 @@
 use crate::{checks, common};
+use std::convert::TryFrom;
 
 pub fn simple_grid(
     x1: &[f32],
@@ -12,7 +13,8 @@ pub fn simple_grid(
     checks::grid_checks(bins, box_size);
 
     // Construct grid
-    let (n_gridbox, bin_size) = grid_size(bins, box_size);
+    let n_gridbox = (box_size / bins[bins.len() - 1]) as u32;
+    let bin_size = box_size / (n_gridbox as f32);
 
     let mut grid: Vec<Vec<GridBox>> = vec![];
 
@@ -39,13 +41,12 @@ pub fn simple_grid(
 
 fn do_counts(
     grid: &Vec<Vec<GridBox>>,
-    x_index: i32,
-    y_index: i32,
+    x_index: u32,
+    y_index: u32,
     bins: &[f32],
     box_size: f32,
     is_autocorr: bool,
 ) -> Vec<u32> {
-    println!("{}", is_autocorr);
     let mut counts: Vec<u32> = vec![0; bins.len() - 1];
     let grid_item = &grid[x_index as usize][y_index as usize];
 
@@ -74,9 +75,6 @@ fn do_counts(
                 ),
             },
         };
-        println!("{:?}, {:?}", grid_item.x1, grid_item.y1);
-        println!("{:?}, {:?}", pair_box.x2, pair_box.y2);
-        println!("{:?}", sub_counts);
         counts = sum_vec(counts, sub_counts);
     }
     counts
@@ -89,16 +87,10 @@ fn sum_vec(mut a: Vec<u32>, b: Vec<u32>) -> Vec<u32> {
     a
 }
 
-fn grid_size(bins: &[f32], box_size: f32) -> (i32, f32) {
-    let n_gridbox = (box_size / bins[bins.len() - 1]) as i32;
-    let bin_size = box_size / (n_gridbox as f32);
-    return (n_gridbox, bin_size);
-}
-
 struct GridBox {
-    x_index: i32,
-    y_index: i32,
-    n_gridbox: i32,
+    x_index: u32,
+    y_index: u32,
+    n_gridbox: u32,
     x1: Vec<f32>,
     y1: Vec<f32>,
     x2: Vec<f32>,
@@ -106,7 +98,7 @@ struct GridBox {
 }
 
 impl GridBox {
-    pub fn new(x_index: i32, y_index: i32, n_gridbox: i32) -> GridBox {
+    pub fn new(x_index: u32, y_index: u32, n_gridbox: u32) -> GridBox {
         GridBox {
             x_index,
             y_index,
@@ -119,9 +111,9 @@ impl GridBox {
     }
 
     pub fn new_with_items(
-        i: i32,
-        j: i32,
-        n_gridbox: i32,
+        i: u32,
+        j: u32,
+        n_gridbox: u32,
         bins_size: f32,
         x1: &[f32],
         y1: &[f32],
@@ -155,10 +147,10 @@ impl GridBox {
     }
 
     // This will soon be in stable
-    fn rem_euclid(&self, x: i32, div: i32) -> u32 {
-        let mut t = x % div;
+    fn rem_euclid(&self, x: i32, div: u32) -> u32 {
+        let mut t: i32 = x % div as i32;
         if t < 0 {
-            t += div;
+            t += div as i32;
         }
         t as u32
     }
@@ -169,12 +161,19 @@ impl GridBox {
         }
         return self.crosscorr_owned_neighbors().to_vec();
     }
+
     fn autocorr_owned_neighbors(&self) -> [[u32; 2]; 5] {
         let delta: [[i32; 2]; 5] = [[0, 0], [1, 0], [1, 1], [0, 1], [-1, 1]];
         let mut res: [[u32; 2]; 5] = [[0, 0]; 5];
         for i in 0..delta.len() {
-            res[i][0] = self.rem_euclid(delta[i][0] + self.x_index, self.n_gridbox);
-            res[i][1] = self.rem_euclid(delta[i][1] + self.y_index, self.n_gridbox);
+            res[i][0] = self.rem_euclid(
+                i32::try_from(self.x_index).unwrap() + delta[i][0],
+                self.n_gridbox,
+            );
+            res[i][1] = self.rem_euclid(
+                i32::try_from(self.y_index).unwrap() + delta[i][1],
+                self.n_gridbox,
+            );
         }
         return res;
     }
@@ -193,8 +192,14 @@ impl GridBox {
         ];
         let mut res: [[u32; 2]; 9] = [[0, 0]; 9];
         for i in 0..delta.len() {
-            res[i][0] = self.rem_euclid(delta[i][0] + self.x_index, self.n_gridbox);
-            res[i][1] = self.rem_euclid(delta[i][1] + self.y_index, self.n_gridbox);
+            res[i][0] = self.rem_euclid(
+                i32::try_from(self.x_index).unwrap() + delta[i][0],
+                self.n_gridbox,
+            );
+            res[i][1] = self.rem_euclid(
+                i32::try_from(self.y_index).unwrap() + delta[i][1],
+                self.n_gridbox,
+            );
         }
         return res;
     }
@@ -202,8 +207,12 @@ impl GridBox {
 
 #[cfg(test)]
 mod test {
-    // use crate::naive::naive;
+    use crate::naive::naive;
     use crate::simple_grid::{simple_grid, GridBox};
+    extern crate rand;
+
+    // use rand::distributions::Uniform;
+    use rand::Rng;
 
     #[test]
     fn basic_autocorr() {
@@ -230,6 +239,48 @@ mod test {
         let res;
         res = simple_grid(&x1, &y1, Some(&x2), Some(&y2), &bins, 7.9);
         assert_eq!(res, vec![2, 1]);
+    }
+
+    fn gen_data(n_items: usize, box_size: f32) -> Vec<f32> {
+        let mut rng = rand::thread_rng();
+        let mut d: Vec<f32> = vec![];
+        for i in 0..n_items {
+            d.push(rng.gen());
+            d[i] *= box_size;
+        }
+        return d;
+    }
+
+    #[test]
+    fn large_autocorr() {
+        let box_size = 100.;
+        let n_items: usize = 300;
+
+        let x1 = gen_data(n_items, box_size);
+        let y1 = gen_data(n_items, box_size);
+
+        let bins = vec![0.0, 1., 2., 3., 4., 5.];
+        let res_grid = simple_grid(&x1, &y1, None, None, &bins, box_size);
+        let res_naive = naive(&x1, &y1, None, None, &bins, box_size);
+        assert_eq!(res_grid, res_naive);
+    }
+
+    #[test]
+    fn large_crosscorr() {
+        let box_size = 100.;
+        let n_items: usize = 300;
+
+        let x1 = gen_data(n_items, box_size);
+        let y1 = gen_data(n_items, box_size);
+        let x2 = gen_data(n_items * 2, box_size);
+        let y2 = gen_data(n_items * 2, box_size);
+
+        let bins = vec![0.0, 1., 2., 3., 4., 5.];
+        let res_naive = naive(&x1, &y1, Some(&x2), Some(&y2), &bins, box_size);
+        let res_grid_1 = simple_grid(&x1, &y1, Some(&x2), Some(&y2), &bins, box_size);
+        assert_eq!(res_grid_1, res_naive);
+        let res_grid_2 = simple_grid(&x2, &y2, Some(&x1), Some(&y1), &bins, box_size);
+        assert_eq!(res_grid_2, res_naive);
     }
 
     #[test]
