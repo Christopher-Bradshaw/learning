@@ -211,7 +211,6 @@ mod test {
     use crate::simple_grid::{simple_grid, GridBox};
     extern crate rand;
 
-    // use rand::distributions::Uniform;
     use rand::Rng;
 
     #[test]
