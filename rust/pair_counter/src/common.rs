@@ -1,3 +1,6 @@
+extern crate ord_subset;
+use ord_subset::OrdSubsetSliceExt;
+
 pub fn is_autocorr(x2: Option<&[f32]>) -> bool {
     match x2 {
         None => true,
@@ -5,16 +8,11 @@ pub fn is_autocorr(x2: Option<&[f32]>) -> bool {
     }
 }
 
-fn get_bin_idx(dist: f32, bins: &[f32]) -> Option<usize> {
-    if dist < bins[0] {
-        return None;
-    }
-    for i in 1..bins.len() {
-        if dist < bins[i] {
-            return Some(i - 1);
-        }
-    }
-    return None;
+fn get_bin_idx(dist: f32, bins: &[f32]) -> usize {
+    return match bins.ord_subset_binary_search(&dist) {
+        Err(idx) => idx,
+        Ok(idx) => idx,
+    };
 }
 
 pub fn count_pairs_crosscorr(
@@ -25,32 +23,26 @@ pub fn count_pairs_crosscorr(
     bins: &[f32],
     box_size: f32,
 ) -> Vec<u32> {
-    let mut counts: Vec<u32> = vec![0; bins.len() - 1];
+    let mut counts: Vec<u32> = vec![0; bins.len() + 1];
     let mut dist;
 
     for i in 0..x1.len() {
         for j in 0..x2.len() {
             dist = compute_distance_with_pbc(x1[i], y1[i], x2[j], y2[j], box_size);
-            match get_bin_idx(dist, bins) {
-                Some(idx) => counts[idx] += 1,
-                None => (),
-            }
+            counts[get_bin_idx(dist, bins)] += 1;
         }
     }
     counts
 }
 
 pub fn count_pairs_autocorr(x1: &[f32], y1: &[f32], bins: &[f32], box_size: f32) -> Vec<u32> {
-    let mut counts: Vec<u32> = vec![0; bins.len() - 1];
+    let mut counts: Vec<u32> = vec![0; bins.len() + 1];
     let mut dist;
 
     for i in 0..x1.len() {
         for j in (i + 1)..x1.len() {
             dist = compute_distance_with_pbc(x1[i], y1[i], x1[j], y1[j], box_size);
-            match get_bin_idx(dist, bins) {
-                Some(idx) => counts[idx] += 1,
-                None => (),
-            }
+            counts[get_bin_idx(dist, bins)] += 1;
         }
     }
     counts
@@ -75,4 +67,15 @@ fn compute_distance_with_pbc(x1: f32, y1: f32, x2: f32, y2: f32, box_size: f32) 
         min
     }
     (min(&dx).powf(2.0) + min(&dy).powf(2.0)).sqrt()
+}
+
+#[cfg(test)]
+mod test {
+    use crate::common::get_bin_idx;
+
+    #[test]
+    fn get_bin_idx_test() {
+        let bins = [1., 2., 3., 4., 5.];
+        assert_eq!(get_bin_idx(2.5, &bins), 2);
+    }
 }

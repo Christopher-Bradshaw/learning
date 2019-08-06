@@ -28,15 +28,17 @@ pub fn simple_grid(
     }
 
     // Do counts
+    // Zeroth bin is for anything inside the inside bin. nth bin is anything outside the outside.
+    // We throw both away before returning.
+    let mut counts: Vec<u32> = vec![0; bins.len() + 1];
     let is_autocorr = common::is_autocorr(x2);
-    let mut counts: Vec<u32> = vec![0; bins.len() - 1];
 
     for i in 0..n_gridbox {
         for j in 0..n_gridbox {
             counts = sum_vec(counts, do_counts(&grid, i, j, bins, box_size, is_autocorr));
         }
     }
-    counts
+    counts[1..bins.len()].to_vec()
 }
 
 fn do_counts(
@@ -47,7 +49,7 @@ fn do_counts(
     box_size: f32,
     is_autocorr: bool,
 ) -> Vec<u32> {
-    let mut counts: Vec<u32> = vec![0; bins.len() - 1];
+    let mut counts: Vec<u32> = vec![0; bins.len() + 1];
     let grid_item = &grid[x_index as usize][y_index as usize];
 
     for [inner_x_index, inner_y_index] in grid_item.owned_neighbors(is_autocorr).iter() {

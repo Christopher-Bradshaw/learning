@@ -18,6 +18,7 @@ Where the binary is the performance test,
 cargo profiler callgrind --bin target/debug/deps/performance-8b1fad358b4c5d86 -- --test simple_grid_perf
 ```
 
+This is great.
 ```
 flamegraph target/debug/deps/performance-8b1fad358b4c5d86 --test simple_grid_perf
 ```
