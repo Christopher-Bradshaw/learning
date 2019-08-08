@@ -1,4 +1,4 @@
-use crate::kdtree_impl::KDNode;
+use crate::kdtree_impl::KDTree;
 use crate::{checks, common};
 
 pub fn kdtree(
@@ -12,7 +12,7 @@ pub fn kdtree(
     checks::all_checks(x1, y1, x2, y2, bins, box_size);
 
     // Construct tree
-    let tree = KDNode::new_tree(x1, y1);
+    let tree = KDTree::new_tree(x1, y1, 10);
 
     // Do counts
     let mut counts: Vec<u32> = vec![0; bins.len() + 1];
