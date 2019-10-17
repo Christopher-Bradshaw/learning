@@ -4,13 +4,16 @@
 // See http://mathworld.wolfram.com/PiFormulas.html
 int main() {
 
-    int num_components = 500, num_threads = 4;
+    long long num_components = 50000000, num_threads = 8;
     double pi_est = 0, numerator;
 
 
 # pragma omp parallel for num_threads(num_threads) \
     private(numerator) reduction(+: pi_est)
-    for (int i = 0; i < num_components; i++) {
+    for (long long i = 0; i < num_components; i++) {
+        if (i % 1000000 == 0) {
+            printf("%lld ", i);
+        }
         // rather than have a double numerator inside the loop (which will reassign memory
         // each loop), mark it private. I'm pretty sure the compiler does something a bit
         // cleverer and initilises it outside the loop.
