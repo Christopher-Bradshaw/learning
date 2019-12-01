@@ -2,7 +2,7 @@
 
 While we are on the python interface it is probably worth also covering the shell. This is launched with `sqlite3`.
 
-**REMEMBER YOU NEED TO TERMINATE QUERIES WITH A ;**
+**Remeber that you need to terminate queries with a `;`**
 
 ## Dot commands and sqlite_master
 
@@ -25,8 +25,25 @@ So for example `.tables` is equivalent to `select name from sqlite_master where 
 
 ## Basic SQL stuff
 
-* `CREATE TABLE tablename (col1 int, col2 string, ...)`
-* `INSERT into tablename values (2, "hehe", ...)`
+Let's say we want to create a new table
+```
+CREATE TABLE tablename (col1 int, col2 string, ...)
+```
+
+Now, we can insert into that table,
+```
+INSERT into tablename values (2, "hehe", ...)
+```
+
+To get info about the columns in a table,
+```
+pragma table_info(tablename)
+```
+
+And to read out the data in a table
+```
+SELECT col1,col2 FROM tablename LIMIT 2;
+```
 
 ## Indexes
 
