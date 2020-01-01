@@ -7,6 +7,14 @@
 import ast
 
 
+class Var(ast.AST):
+    _fields = ("ref", "type")
+
+    def __init__(self, ref, typ=None):
+        self.ref, self.type = ref, typ
+        super().__init__()
+
+
 class Assign(ast.AST):
     _fields = ("ref", "val", "type")
 
@@ -22,9 +30,18 @@ class PrimOp(ast.AST):
         self.fn, self.args = fn, args
         super().__init__()
 
+
 class Func(ast.AST):
     _fields = ("fname", "args", "body")
 
     def __init__(self, fname, args, body):
         self.fname, self.args, self.body = fname, args, body
+        super().__init__()
+
+
+class Return(ast.AST):
+    _fields = ("val",)
+
+    def __init__(self, val):
+        self.val = val
         super().__init__()

@@ -20,38 +20,41 @@ class PythonVisitor(ast.NodeVisitor):
 
         self._source = source
         self._ast = ast.parse(source)
-        self.visit(self._ast)
+
+        print("PYTHON")
+        print(pformat_ast(self._ast))
+        res = self.visit(self._ast)
+        print("CORE")
+        print(pformat_ast(res[0]))
 
     # Define all the visitors
     def visit_Module(self, node):
-        print("Module visitor")
-        print(pformat_ast(node))
         # The module contains multiple objects. Visit each of them
-        res = list(map(self.visit, node.body))
-        print(res)
+        return list(map(self.visit, node.body))
 
     def visit_FunctionDef(self, node):
-        print("Function visitor")
         statements = node.body
-        print(statements)
         statements = list(map(self.visit, statements))
+        args = list(map(self.visit, node.args.args))
 
-        return core.Func(node.name, node.args, node.body)
+        return core.Func(node.name, args, statements)
 
     def visit_Assign(self, node):
-        print("Assign visitor")
         ref = node.targets[0].id
         val = self.visit(node.value)
-        print(ref, val)
-        # core.Assign(
+        return core.Assign(ref, val)
 
     def visit_BinOp(self, node):
-        print("BinOp visitor")
         primops = {ast.Add: "add#", ast.Mult: "mult#"}
         return core.PrimOp(
             primops[node.op.__class__], [self.visit(node.left), self.visit(node.right)]
         )
 
+    def visit_Name(self, node):
+        return core.Var(node.id)
+
     def visit_Return(self, node):
-        print(node)
-        print("Return visitor")
+        return core.Return(node.value.id)
+
+    def visit_arg(self, node):
+        return core.Var(node.arg)
