@@ -45,3 +45,11 @@ class Return(ast.AST):
     def __init__(self, val):
         self.val = val
         super().__init__()
+
+
+class Num(ast.AST):
+    _fields = ("n",)
+
+    def __init__(self, n, typ=None):
+        self.n, self.typ = n, typ
+        super().__init__()

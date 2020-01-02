@@ -3,6 +3,8 @@ from textwrap import dedent
 
 from .ast_printers import pformat_ast
 from . import core
+from .common import primops
+
 
 # Walk the python ast and return the core language
 class PythonVisitor(ast.NodeVisitor):
@@ -21,8 +23,8 @@ class PythonVisitor(ast.NodeVisitor):
         self._source = source
         self._ast = ast.parse(source)
 
-        # print("PYTHON")
-        # print(pformat_ast(self._ast))
+        print("PYTHON")
+        print(pformat_ast(self._ast))
 
         res = self.visit(self._ast)
 
@@ -49,7 +51,6 @@ class PythonVisitor(ast.NodeVisitor):
         return core.Assign(ref, val)
 
     def visit_BinOp(self, node):
-        primops = {ast.Add: "add#", ast.Mult: "mult#"}
         return core.PrimOp(
             primops[node.op.__class__], [self.visit(node.left), self.visit(node.right)]
         )
@@ -58,7 +59,13 @@ class PythonVisitor(ast.NodeVisitor):
         return core.Var(node.id)
 
     def visit_Return(self, node):
-        return core.Return(node.value.id)
+        return core.Return(self.visit(node.value))
 
     def visit_arg(self, node):
         return core.Var(node.arg)
+
+    def visit_Num(self, node):
+        return core.Num(node.n)
+
+    def visit_Name(self, node):
+        return core.Var(node.id)
