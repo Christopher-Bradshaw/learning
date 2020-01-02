@@ -21,11 +21,15 @@ class PythonVisitor(ast.NodeVisitor):
         self._source = source
         self._ast = ast.parse(source)
 
-        print("PYTHON")
-        print(pformat_ast(self._ast))
+        # print("PYTHON")
+        # print(pformat_ast(self._ast))
+
         res = self.visit(self._ast)
+
         print("CORE")
         print(pformat_ast(res[0]))
+
+        return res
 
     # Define all the visitors
     def visit_Module(self, node):
