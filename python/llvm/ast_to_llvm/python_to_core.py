@@ -1,4 +1,6 @@
 import ast
+import inspect
+import types
 from textwrap import dedent
 
 from .ast_printers import pformat_ast
@@ -13,23 +15,29 @@ class PythonVisitor(ast.NodeVisitor):
         self._ast = None
 
     # Source might be given in many formats (string, func obj, etc)
-    def __call__(self, source):
+    def __call__(self, source, p=False):
         if isinstance(source, str):
             source = dedent(source)
+        elif isinstance(source, types.FunctionType):
+            source = dedent(inspect.getsource(source))
         else:
             raise NotImplementedError
-        print(source)
+
+        if p:
+            print(source)
 
         self._source = source
         self._ast = ast.parse(source)
 
-        print("PYTHON")
-        print(pformat_ast(self._ast))
+        if p:
+            print("PYTHON")
+            print(pformat_ast(self._ast))
 
-        res = self.visit(self._ast)
+        res = self.visit(self._ast)[0]
 
-        print("CORE")
-        print(pformat_ast(res[0]))
+        if p:
+            print("CORE")
+            print(pformat_ast(res[0]))
 
         return res
 
@@ -66,6 +74,3 @@ class PythonVisitor(ast.NodeVisitor):
 
     def visit_Num(self, node):
         return core.Num(node.n)
-
-    def visit_Name(self, node):
-        return core.Var(node.id)

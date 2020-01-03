@@ -3,7 +3,6 @@ import llvmlite.ir as ir
 import llvmlite.binding as binding
 
 from .ast_printers import pformat_ast
-from .common import primops
 
 int32 = ir.IntType(32)
 
@@ -24,11 +23,21 @@ class LLVMEmitter(ast.NodeVisitor):
         # Our function takes 2 ints and returns 1 int
         self.func_type = ir.FunctionType(int32, (int32, int32))
 
+    def __call__(self, node, p=False):
+        if p:
+            print("CORE")
+            print(pformat_ast(node))
+        llvm_func = self.visit(node)
+
+        if p:
+            print("\nLLVM")
+            print(self.function)
+        return llvm_func
+
     def visit_Func(self, node):
-        print("CORE")
-        print(pformat_ast(node))
 
         # Create the basic structure
+        self.function_name = node.fname
         self.function = ir.Function(
             self.module_name, self.func_type, self.function_name
         )
@@ -46,9 +55,6 @@ class LLVMEmitter(ast.NodeVisitor):
         # turn and build up the LLVM IR
         list(map(self.visit, node.body))
 
-        # And done, print + return the result
-        print("\nLLVM")
-        print(self.function)
         return self.function
 
     def visit_PrimOp(self, node):
@@ -101,3 +107,10 @@ def compile_code(engine, code):
     engine.add_module(mod)
     engine.finalize_object()
     engine.run_static_constructors()
+
+
+# def compile_code_with_opt(engine, code):
+#     pmb = binding.PassManagerBuilder()
+#     print(pmb.opt_level)
+#     pmb.opt_level = 3
+#     print(pmb.opt_level)

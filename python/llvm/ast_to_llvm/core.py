@@ -48,8 +48,8 @@ class Return(ast.AST):
 
 
 class Num(ast.AST):
-    _fields = ("n",)
+    _fields = ("n", "type")
 
     def __init__(self, n, typ=None):
-        self.n, self.typ = n, typ
+        self.n, self.type = n, typ
         super().__init__()
