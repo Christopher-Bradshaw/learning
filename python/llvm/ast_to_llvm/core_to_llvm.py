@@ -35,7 +35,6 @@ class LLVMEmitter(ast.NodeVisitor):
         return llvm_func
 
     def visit_Func(self, node):
-
         # Create the basic structure
         self.function_name = node.fname
         self.function = ir.Function(
@@ -107,10 +106,3 @@ def compile_code(engine, code):
     engine.add_module(mod)
     engine.finalize_object()
     engine.run_static_constructors()
-
-
-# def compile_code_with_opt(engine, code):
-#     pmb = binding.PassManagerBuilder()
-#     print(pmb.opt_level)
-#     pmb.opt_level = 3
-#     print(pmb.opt_level)

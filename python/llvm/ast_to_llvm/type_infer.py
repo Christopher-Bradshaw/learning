@@ -1,7 +1,59 @@
 import ast
+import unification
 
 from .ast_printers import pformat_ast
-from .type_definitions import TVar, int64, float64
+from .type_definitions import TVar, TFun, int64, float64
+
+
+def function_sig_reify(func_sig: TFun, mgu):
+    func_sig.arg_types = _reify(func_sig.arg_types, mgu)
+    func_sig.ret_type = _reify(func_sig.ret_type, mgu)
+    return func_sig
+
+
+def _reify(val, mgu):
+    if isinstance(val, TVar):
+        return unification.reify(unification.var(val), mgu)
+    if isinstance(val, list):
+        return [_reify(val_i, mgu) for val_i in val]
+    return val
+
+
+class TypeReify(ast.NodeVisitor):
+    def __init__(self, mgu):
+        self.mgu = mgu
+
+    def __call__(self, node):
+        self.visit(node)
+
+    def _reify(self, val):
+        return _reify(val, self.mgu)
+
+    def visit_Func(self, node):
+        for i, _ in enumerate(node.args):
+            node.args[i].type = self._reify(node.args[i].type)
+
+        list(map(self.visit, node.body))
+
+    def visit_Num(self, node):
+        pass
+
+    def visit_Var(self, node):
+        node.type = self._reify(node.type)
+
+    def visit_Assign(self, node):
+        node.type = self._reify(node.type)
+        self.visit(node.val)
+
+    def visit_PrimOp(self, node):
+        if node.fn == "add#":
+            self.visit(node.args[0])
+            self.visit(node.args[1])
+        else:
+            raise NotImplementedError
+
+    def visit_Return(self, node):
+        self.visit(node.val)
 
 
 class TypeInfer(ast.NodeVisitor):
@@ -21,7 +73,7 @@ class TypeInfer(ast.NodeVisitor):
             print("CORE")
             print(pformat_ast(node))
 
-        self.visit(node)
+        func_type = self.visit(node)
 
         if p:
             print("TYPED CORE")
@@ -35,14 +87,13 @@ class TypeInfer(ast.NodeVisitor):
             print()
             print("Signature")
             print(self.arg_types, "->", self.ret_type)
-        return node, self.constraints
+        return func_type, self.constraints
 
     # This generates a fresh variables name.
     def fresh(self):
         return TVar("$" + next(self.names))
 
     def visit_Func(self, node):
-
         # The argument types are unknown
         self.arg_types = [self.fresh() for i in node.args]
         for i, _ in enumerate(node.args):
@@ -54,7 +105,8 @@ class TypeInfer(ast.NodeVisitor):
 
         # Parse the body
         list(map(self.visit, node.body))
-        return node
+
+        return TFun(self.arg_types, self.ret_type)
 
     def visit_Num(self, node):
         typ = self.fresh()
@@ -89,7 +141,7 @@ class TypeInfer(ast.NodeVisitor):
             typ_l = self.visit(node.args[0])
             typ_r = self.visit(node.args[1])
             self.constraints.append((typ_l, typ_r))
-            return typ_l
+            return typ_r
         else:
             raise NotImplementedError
 
@@ -97,6 +149,18 @@ class TypeInfer(ast.NodeVisitor):
         typ = self.visit(node.val)
         self.constraints.append((typ, self.ret_type))
         return None
+
+
+def compute_mgu(constraints):
+    def varify(x):
+        if isinstance(x, TVar):
+            return unification.var(x)
+        return x
+
+    constraints_l = tuple([varify(c[0]) for c in constraints])
+    constraints_r = tuple([varify(c[1]) for c in constraints])
+    mgu = unification.unify(constraints_l, constraints_r)
+    return mgu
 
 
 def gen_names():
