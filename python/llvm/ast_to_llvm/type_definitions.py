@@ -1,3 +1,6 @@
+import llvmlite.ir as ir
+from ctypes import c_double, c_int
+
 # This is a type constructor
 # See below for how it builds our types!
 class TCon:
@@ -23,6 +26,10 @@ class TCon:
 int64 = TCon("Int64")
 # float32 = TCon("Float")
 float64 = TCon("Float64")
+
+core_to_llvm_types = {int64: ir.IntType(64), float64: ir.DoubleType()}
+core_to_ctypes = {int64: c_int, float64: c_double}
+
 
 # Convert python types to C types
 def arg_type(arg):

@@ -23,8 +23,16 @@ class TypeReify(ast.NodeVisitor):
     def __init__(self, mgu):
         self.mgu = mgu
 
-    def __call__(self, node):
+    def __call__(self, node, p=False):
+        if p:
+            print("Pre Reify")
+            print(pformat_ast(node))
+            print(self.mgu)
         self.visit(node)
+        if p:
+            print("Post Reify")
+            print(pformat_ast(node))
+        return node
 
     def _reify(self, val):
         return _reify(val, self.mgu)
@@ -36,7 +44,7 @@ class TypeReify(ast.NodeVisitor):
         list(map(self.visit, node.body))
 
     def visit_Num(self, node):
-        pass
+        node.type = self._reify(node.type)
 
     def visit_Var(self, node):
         node.type = self._reify(node.type)
@@ -60,6 +68,7 @@ class TypeInfer(ast.NodeVisitor):
     def __init__(self):
         self.names = gen_names()
         self.arg_types = None
+        self.called_with_types = None
         self.ret_type = None
 
         # Once we've seen a variable, keep track of its type as it cannot change!
@@ -68,10 +77,11 @@ class TypeInfer(ast.NodeVisitor):
         # A list of 2 tuples whose pairs need to have the same type
         self.constraints = []
 
-    def __call__(self, node, p=False):
+    def __call__(self, node, called_with_types, p=False):
         if p:
             print("CORE")
             print(pformat_ast(node))
+        self.called_with_types = called_with_types
 
         func_type = self.visit(node)
 
@@ -87,7 +97,7 @@ class TypeInfer(ast.NodeVisitor):
             print()
             print("Signature")
             print(self.arg_types, "->", self.ret_type)
-        return func_type, self.constraints
+        return node, func_type, self.constraints
 
     # This generates a fresh variables name.
     def fresh(self):
@@ -99,6 +109,7 @@ class TypeInfer(ast.NodeVisitor):
         for i, _ in enumerate(node.args):
             node.args[i].type = self.arg_types[i]
             self.seen_vars[node.args[i].ref] = self.arg_types[i]
+            self.constraints.append((node.args[i].type, self.called_with_types[i]))
 
         # As is the return type
         self.ret_type = TVar("$ret_type")

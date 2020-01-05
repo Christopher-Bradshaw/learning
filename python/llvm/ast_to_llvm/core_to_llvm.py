@@ -3,8 +3,7 @@ import llvmlite.ir as ir
 import llvmlite.binding as binding
 
 from .ast_printers import pformat_ast
-
-int32 = ir.IntType(32)
+from .type_definitions import TFun, core_to_llvm_types, int64, float64
 
 
 # This gets applied to a function
@@ -12,6 +11,7 @@ class LLVMEmitter(ast.NodeVisitor):
     def __init__(self):
         # These will be set while we build the function
         self.function = None
+        self.func_type = None
         self.builder = None
 
         # These are needed so that we can find the address of local variables
@@ -20,13 +20,17 @@ class LLVMEmitter(ast.NodeVisitor):
 
         self.function_name = "fname"
         self.module_name = ir.Module("mname")
-        # Our function takes 2 ints and returns 1 int
-        self.func_type = ir.FunctionType(int32, (int32, int32))
 
-    def __call__(self, node, p=False):
+    def __call__(self, node, func_type: TFun, p=False):
         if p:
             print("CORE")
             print(pformat_ast(node))
+
+        self.func_type = ir.FunctionType(
+            core_to_llvm_types[func_type.ret_type],
+            tuple([core_to_llvm_types[t] for t in func_type.arg_types]),
+        )
+
         llvm_func = self.visit(node)
 
         if p:
@@ -43,8 +47,10 @@ class LLVMEmitter(ast.NodeVisitor):
         block = self.function.append_basic_block("entry")
         self.builder = ir.IRBuilder(block)
 
-        for (core_arg, func_arg) in zip(node.args, self.function.args):
-            typ = int32
+        for (core_arg, func_arg, func_arg_type) in zip(
+            node.args, self.function.args, self.func_type.args
+        ):
+            typ = func_arg_type
             name = core_arg.ref
             alloc = self.builder.alloca(typ, name=name)
             self.builder.store(func_arg, alloc)
@@ -60,7 +66,14 @@ class LLVMEmitter(ast.NodeVisitor):
         if node.fn == "add#":
             l = self.visit(node.args[0])
             r = self.visit(node.args[1])
-            return self.builder.add(l, r)
+            # if node.type is
+            if l.type is core_to_llvm_types[float64]:
+                return self.builder.fadd(l, r)
+            elif l.type is core_to_llvm_types[int64]:
+                return self.builder.add(l, r)
+            else:
+                return NotImplementedError
+
         else:
             raise NotImplementedError
 
@@ -69,7 +82,7 @@ class LLVMEmitter(ast.NodeVisitor):
         if name in self.locals:
             raise NotImplementedError
         else:
-            typ = int32
+            typ = core_to_llvm_types[node.type]
             val = self.visit(node.val)
             alloc = self.builder.alloca(typ, name=name)
             self.builder.store(val, alloc)
@@ -79,7 +92,8 @@ class LLVMEmitter(ast.NodeVisitor):
         self.builder.ret(self.visit(node.val))
 
     def visit_Num(self, node):
-        return ir.Constant(int32, node.n)
+        typ = core_to_llvm_types[node.type]
+        return ir.Constant(typ, node.n)
 
     def visit_Var(self, node):
         return self.builder.load(self.locals[node.ref])
