@@ -1,4 +1,4 @@
-from ctypes import CFUNCTYPE, c_double, c_int
+from ctypes import CFUNCTYPE
 
 from .python_to_core import PythonVisitor
 from .type_infer import TypeInfer, TypeReify, compute_mgu, function_sig_reify
@@ -12,7 +12,7 @@ def autojit(func):
     name = func.__name__
 
     def _wrapper(*args):
-        # Work out what the mangled name is
+        # Work out what the mangled name is. Really we should cache this
         arg_types = tuple(map(arg_type, args))
         mangled_name = mangler(arg_types, name)
 
