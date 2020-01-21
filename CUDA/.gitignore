@@ -1,0 +1,10 @@
+*a.out
+*.o
+*.a
+*.so
+
+compilation/mathy
+compilation/simple
+mpi/hello
+c++/classes_main
+c++/a.out
