@@ -42,4 +42,4 @@ The total number of warps is `ceil(ThreadsPerBlock / WarpSize)`
 ### Compute Capabilities
 
 See [the docs, appendix H](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#compute-capabilities). To know what is going on, you also need to know your hardware's compute capability. See [these tables](https://developer.nvidia.com/cuda-gpus#compute) (you need to click into e.g. CUDA-enabled GeForce Products) to get that number.
-
+My 1060 has compute capability of 6.1.

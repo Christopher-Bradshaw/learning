@@ -9,9 +9,11 @@ def double(inp, out):
     bw = cuda.blockDim.x
 
     idx = tx + bx * bw
+    assert idx == cuda.grid(1)  # 1 dimension
+    assert bw == cuda.gridsize(1)
     while idx < len(inp):
         out[idx] = inp[idx] * 2
-        idx += bw
+        idx += cuda.gridsize(1)
 
 
 def main():
