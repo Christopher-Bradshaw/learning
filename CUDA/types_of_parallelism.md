@@ -4,8 +4,32 @@
 
 * SISD: Single instruction, single data stream. This is a basic, serial computer.
 * MISD: Multiple instruction, single data stream. Apply multiple operations to a single data stream. Not practical.
-* SIMD: Single instruction, multiple data streams. Apply the same operation to multiple pieces of data at the same time. For example, computing a the vector sum in parallel.
-* MIMD: Multiple instruction, multiple data streams. Multiple processors executing different instructions of different data. For example, compute a ...
+* SIMD: Single instruction, multiple data streams. Apply the same operation to multiple pieces of data at the same time.
+* MIMD: Multiple instruction, multiple data streams. Multiple processors executing different instructions of different data.
+
+### SIMD
+
+[AVX](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) is an example of SIMD. Most modern processors support AVX-256 which allows execution of eight 32 bit floating point arithmetic operations (or four 64 bit).
+
+You can see this happening by compiling,
+
+```
+int avx_add(int in) {
+    int res = 0;
+    for(int i=0; i<in; i++) {
+        res += i;
+    }
+    return res;
+}
+```
+```
+$ gcc -c simd.c -o simd.o -mavx
+$ objdump -dSr simd.o
+```
+
+and look for the use of the `xmmX` registers and the vector add instructions (`vaddss`).
+
+
 
 
 ## Types of parallelism
