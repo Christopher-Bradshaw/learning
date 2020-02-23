@@ -1,7 +1,9 @@
 # GPU
 
+![](./GPU_arch.png)
 
-## GeForce 1060 
+
+## GeForce 1060
 
 According to the [specs](https://www.geforce.com/hardware/desktop-gpus/geforce-gtx-1060/specifications) my 1060 has 1280 CUDA cores.
 
