@@ -1,8 +1,16 @@
-# CUDA
+# GPU programming with CUDA
+
+## Basic terminology
+
+Computation is either done on the `host` (the CPU) or a `device` (a CUDA enabled GPU).
+
+GPU's excel when the problem contains lots of *data parallelism*. See [the different types of parallelism](./types_of_parallelism.md).
+
+
 
 ## Compilation
 
-Compile with `nvcc`. This appears to compile in C/C++ mode if the file extension is .c/.cpp. Make sure to have the extension of `.cu`. See [the docs](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#supported-input-file-suffixes)
+Compile with `nvcc`. This appears to compile in C/C++ mode if the file extension is .c/.cpp. Make sure to have the extension of `.cu` if you want to compile the CUDA stuff! See [the docs](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#supported-input-file-suffixes)
 
 ### Useful flags
 * `nvcc --run file.cu`: Run it
@@ -43,3 +51,7 @@ The total number of warps is `ceil(ThreadsPerBlock / WarpSize)`
 
 See [the docs, appendix H](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#compute-capabilities). To know what is going on, you also need to know your hardware's compute capability. See [these tables](https://developer.nvidia.com/cuda-gpus#compute) (you need to click into e.g. CUDA-enabled GeForce Products) to get that number.
 My 1060 has compute capability of 6.1.
+
+### Getting info
+
+* `nvidia-smi`
