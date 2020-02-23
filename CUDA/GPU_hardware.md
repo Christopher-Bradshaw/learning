@@ -1,6 +1,6 @@
 # GPU Hardwar model
 
-Any specific numbers probably will be for my GeForce 1060 6GB card ([specs](https://www.geforce.com/hardware/desktop-gpus/geforce-gtx-1060/specifications) and a [good article](https://wccftech.com/nvidia-geforce-gtx-1060-final-specifications/)).
+Any specific numbers probably will be for my GeForce 1060 6GB card ([specs](https://www.nvidia.com/en-us/geforce/10-series/) and a [good article](https://wccftech.com/nvidia-geforce-gtx-1060-final-specifications/)).
 This has [compute capability](https://people.maths.ox.ac.uk/gilesm/cuda/lecs/lec1-2x2.pdf) of 6.1 (see these [tables](https://developer.nvidia.com/cuda-gpus#compute)).
 
 A lot of this info comes from Nvidia's Fermi archtecture whitepaper. See [here](https://www.nvidia.com/content/PDF/fermi_white_papers/NVIDIAFermiComputeArchitectureWhitepaper.pdf) or [here](./assets/fermi_whitepaper.pdf).
@@ -88,12 +88,30 @@ The limit to the number of warps that can run concurrently is the amount of regi
 
 ### Transfers betwee host and device
 
-These are often the slowest parts of a kernel. The hard, unbeatable limit is enforced by the PCIe transfer speed. This is (assuming PCIe 3.0 x16) 16GB/s. However, there are other factors that can make us not hit this.
-
+These are often the slowest parts of a kernel. The hard, unbeatable limit is enforced by the PCIe transfer bandwidth. This is (assuming PCIe 3.0 x16) 16GB/s. However, there are other factors that can make us not hit this.
 
 Normal, [pageable](https://en.wikipedia.org/wiki/Paging), memory cannot be transferred to the device using direct memory access ([DMA](https://en.wikipedia.org/wiki/Direct_memory_access)]). So, the process of getting memory onto the GPU starts with a copy from pageable to non-pageable memory, followed by a DMA to the GPU (e.g. [here](https://devblogs.nvidia.com/how-optimize-data-transfers-cuda-cc/)). If we know we need to send the memory to the GPU, assign non-pageable memory in the first place. Of course this comes with the caveat that you are more likely to run out of memory...
 
 There is also some overhead to each transfer, so many small transfers will be slower than a single large one.
+
+We can confirm that PCIe is the limiting factor, and not our RAM.  Let's say we have dual channel (two stick) DDR4-2400 (double data rate @ 1200Mhz. The 2400 stands for Mtransfer/s). The data rate is therefore
+
+```
+dual_channel * frequency * ddr * bus_size = 2 * 1.2 G * 2 * 8B ~ 40GB/s
+```
+
+Which is much larger than the PCIe bandwidth.
+
+### Global Memory
+
+The device's global memory is not a single DRAM chip. However, we know that the memory is GDDR5/X which has a transfer rate of 8Gb/s or 1GB/s. It also has a bus size of 32 bits, meaning that each DRAM chipe can actually transfer 32GB/s. The specs show that the overall memory interface width is 192, which suggests that there are 6 DRAM chips. This is confirmed by [this](https://cdn.arstechnica.net/wp-content/uploads/sites/3/2016/07/GeForce_GTX_1060_Block_Diagram_FINAL_1467926505.png) and [this](http://cdn.wccftech.com/wp-content/uploads/2017/04/nvidia-geforce-gtx-1060-pcb-Custom.png). Overall memory bandwidth is therefore,
+
+```
+n_dram_chips * speed_of_gddr5 * bus_size_gddr5 = 6 * 1GB/s * 32 = 192 GB/s
+```
+
+So, once we have the data on the device, we can pump it fast! We therefore really want to avoid excess transfers to and from.
+
 
 ### Transfers between global memory and SM
 
