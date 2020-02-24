@@ -1,4 +1,4 @@
-# GPU Hardwar model
+# GPU Hardware model
 
 Any specific numbers probably will be for my GeForce 1060 6GB card ([specs](https://www.nvidia.com/en-us/geforce/10-series/) and a [good article](https://wccftech.com/nvidia-geforce-gtx-1060-final-specifications/)).
 This has [compute capability](https://people.maths.ox.ac.uk/gilesm/cuda/lecs/lec1-2x2.pdf) of 6.1 (see these [tables](https://developer.nvidia.com/cuda-gpus#compute)).
