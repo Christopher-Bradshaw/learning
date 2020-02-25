@@ -1,3 +1,5 @@
+// Compile with:
+// g++ hello_world.cpp -o hello_world -lglut -lGL
 #include <GL/glut.h>
 
 void displayMe(void)
