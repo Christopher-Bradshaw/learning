@@ -1,28 +1,8 @@
+#include "julia.hpp"
 #include <complex>
 #include <iostream>
-#include "file_output.hpp"
 
-typedef std::complex<float> cfloat;
-
-void julia(int, int, cfloat, float, float, float, float, int, int **);
-cfloat iter_julia(cfloat, cfloat);
-
-int main(void) {
-    cfloat c = {0.5, 0.4};
-    int x_pixels = 2000, y_pixels = 2000;
-    int max_value = 200;
-    // Allocate the result array
-    int **res = (int **)calloc(x_pixels, sizeof(int *));
-    for (int i = 0; i < x_pixels; i++) {
-        res[i] = (int *)calloc(y_pixels, sizeof(int));
-    }
-
-    julia(x_pixels, y_pixels, c, -1.5, 1.5, -1.5, 1.5, max_value, res);
-
-    file_output::write_ppm(res, x_pixels, y_pixels, max_value);
-    file_output::write_jpg(res, x_pixels, y_pixels, max_value);
-}
-
+namespace julia {
 void julia(int x_pixels, int y_pixels, cfloat c, float left_edge,
            float right_edge, float bottom_edge, float top_edge, int max_value,
            int **res) {
@@ -36,7 +16,7 @@ void julia(int x_pixels, int y_pixels, cfloat c, float left_edge,
                           (float)y / y_pixels * height + bottom_edge};
 
             while (res[x][y] < max_value) {
-                pos = iter_julia(pos, c);
+                pos = julia::iter_julia(pos, c);
                 if (std::abs(pos) >= 2) {
                     break;
                 }
@@ -47,3 +27,4 @@ void julia(int x_pixels, int y_pixels, cfloat c, float left_edge,
 }
 
 cfloat iter_julia(cfloat z_old, cfloat c) { return std::pow(z_old, 2) + c; }
+}  // namespace julia
