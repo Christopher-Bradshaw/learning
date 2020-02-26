@@ -36,7 +36,7 @@ void julia_gpu(int x_pixels, int y_pixels, cfloat c, float left_edge, float righ
     int *dev_res;
     cudaMalloc(&dev_res, x_pixels * y_pixels * sizeof(int));
 
-    int n_blocks = 32;
+    int n_blocks = 256;
     int n_threads = 32;
     julia_gpu_kernel<<<n_blocks, n_threads>>>(x_pixels, y_pixels, c.real(), c.imag(), left_edge, right_edge, bottom_edge, top_edge, max_value, dev_res);
 

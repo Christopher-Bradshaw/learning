@@ -1,10 +1,17 @@
+.DEFAULT_GOAL := julia
+
 COMPILER_OPTIONS := -Wall -Wextra -x c++
 IMAGEMAGICK_HEADERS := `/usr/lib/x86_64-linux-gnu/ImageMagick-6.9.10/bin-q16/Magick++-config --cppflags --cxxflags`
 IMAGEMAGICK_LIBS := `/usr/lib/x86_64-linux-gnu/ImageMagick-6.9.10/bin-q16/Magick++-config --ldflags --libs`
 CUDA_COMPILER_OPTIONS := $(foreach option, $(COMPILER_OPTIONS), --compiler-options $(option))
 
-julia: *.cpp
+julia.o: julia.cu *.hpp
 	nvcc ${CUDA_COMPILER_OPTIONS} -c julia.cu -o julia.o
-	clang++ ${COMPILER_OPTIONS} ${IMAGEMAGICK_HEADERS} -c file_output.cpp
+main.o: main.cpp *.hpp
 	clang++ ${COMPILER_OPTIONS} -c main.cpp -o main.o
+file_output.o: file_output.cpp *.hpp
+	clang++ ${COMPILER_OPTIONS} ${IMAGEMAGICK_HEADERS} -c file_output.cpp
+
+julia: *.o
 	clang++ ${IMAGEMAGICK_LIBS} -o main main.o julia.o file_output.o -lcudart
+
