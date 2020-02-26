@@ -12,6 +12,8 @@ GPU's excel when the problem contains lots of *data parallelism*. See [the diffe
 
 Compile with `nvcc`. This appears to compile in C/C++ mode if the file extension is .c/.cpp. Make sure to have the extension of `.cu` if you want to compile the CUDA stuff! See [the docs](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#supported-input-file-suffixes)
 
+If you compile a cuda object file `nvcc -c lib.cu -o lib.o` and want to link this into your main project `clang++ main.o lib.o` you need to explicitly include the cuda library `-lcudart`.
+
 ### Useful flags
 * `nvcc --run file.cu`: Run it
 * `-g`: Adds debug info

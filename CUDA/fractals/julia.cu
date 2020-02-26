@@ -3,9 +3,10 @@
 #include <iostream>
 
 namespace julia {
+
 void julia(int x_pixels, int y_pixels, cfloat c, float left_edge,
            float right_edge, float bottom_edge, float top_edge, int max_value,
-           int **res) {
+           int *res) {
     auto width = right_edge - left_edge;
     auto height = top_edge - bottom_edge;
 
@@ -15,16 +16,24 @@ void julia(int x_pixels, int y_pixels, cfloat c, float left_edge,
             cfloat pos = {(float)x / x_pixels * width + left_edge,
                           (float)y / y_pixels * height + bottom_edge};
 
-            while (res[x][y] < max_value) {
+            while (res[x + y * x_pixels] < max_value) {
                 pos = julia::iter_julia(pos, c);
                 if (std::abs(pos) >= 2) {
                     break;
                 }
-                res[x][y] += 1;
+                res[x+y * x_pixels] += 1;
             }
         }
     }
 }
-
 cfloat iter_julia(cfloat z_old, cfloat c) { return std::pow(z_old, 2) + c; }
+
+void julia_gpu(int x_pixels, int y_pixels, cfloat c, float left_edge,
+           float right_edge, float bottom_edge, float top_edge, int max_value,
+           int *res) {
+    auto width = right_edge - left_edge;
+    auto height = top_edge - bottom_edge;
+
+}
+
 }  // namespace julia
