@@ -6,7 +6,7 @@
 __constant__ float c_dev[2];
 __constant__ float edges[4];
 __constant__ int n_pixels[2];
-__constant__ float max_value_dev;
+__constant__ int max_value_dev;
 
 namespace julia {
 // Declare this here because we don't want to export it
@@ -59,9 +59,6 @@ void julia_gpu(int x_pixels, int y_pixels, cfloat c, float left_edge, float righ
     assert(cudaMemcpyToSymbol(edges, tmp_edges, sizeof(tmp_edges)) == cudaSuccess);
     assert(cudaMemcpyToSymbol(max_value_dev, &max_value, sizeof(max_value)) == cudaSuccess);
     assert(cudaMemcpyToSymbol(n_pixels, tmp_n_pixels, sizeof(tmp_n_pixels)) == cudaSuccess);
-
-
-
 
     julia_gpu_kernel<<<n_blocks, n_threads>>>(dev_res);
 
