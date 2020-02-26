@@ -12,6 +12,9 @@ void write_ppm(int *res, int x_pixels, int y_pixels, int max_value) {
     f << max_value << std::endl;
     for (int i = 0; i < x_pixels * y_pixels; i++) {
         f << res[i] << " ";
+        if (i % x_pixels == 0) {
+            f << std::endl;
+        }
     }
     f << std::endl;
     f.close();
