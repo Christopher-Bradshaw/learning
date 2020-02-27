@@ -5,6 +5,7 @@
 
 __constant__ float c_dev[2];
 __constant__ float edges[4];
+__constant__ float size[2];
 __constant__ int n_pixels[2];
 __constant__ int max_value_dev;
 
@@ -43,27 +44,30 @@ void julia_gpu(int x_pixels, int y_pixels, cfloat c, float left_edge, float righ
     cudaEventCreate(&stop);
     cudaEventRecord(start, 0);
 
-
     // Space on device
     int *dev_res;
     assert(cudaMalloc(&dev_res, x_pixels * y_pixels * sizeof(int)) == cudaSuccess);
 
-    int n_blocks = 256;
-    int n_threads = 32;
-
     float tmp_c[2] = {c.real(), c.imag()};
     float tmp_edges[4] = {left_edge, right_edge, bottom_edge, top_edge};
+    float tmp_size[2] = {right_edge - left_edge, top_edge - bottom_edge};
     int tmp_n_pixels[2] = {x_pixels, y_pixels};
 
     assert(cudaMemcpyToSymbol(c_dev, tmp_c, sizeof(tmp_c)) == cudaSuccess);
     assert(cudaMemcpyToSymbol(edges, tmp_edges, sizeof(tmp_edges)) == cudaSuccess);
     assert(cudaMemcpyToSymbol(max_value_dev, &max_value, sizeof(max_value)) == cudaSuccess);
     assert(cudaMemcpyToSymbol(n_pixels, tmp_n_pixels, sizeof(tmp_n_pixels)) == cudaSuccess);
+    assert(cudaMemcpyToSymbol(size, tmp_size, sizeof(tmp_size)) == cudaSuccess);
 
-    julia_gpu_kernel<<<n_blocks, n_threads>>>(dev_res);
+    // When working in more than 1d we don't do the loop. We just spin up enough blocks to cover the image.
+    dim3 threadsPerBlock(16, 16);
+    dim3 blocks(x_pixels / 16, y_pixels / 16);
+
+    julia_gpu_kernel<<<blocks, threadsPerBlock>>>(dev_res);
 
     // Copy results back to the host
     assert(cudaMemcpy(res, dev_res, x_pixels * y_pixels * sizeof(int), cudaMemcpyDeviceToHost) == cudaSuccess);
+    assert(cudaFree(dev_res) == cudaSuccess);
 
     cudaEventRecord(stop);
     // ^ tells us to record an event when we get here. But we can't read the time off it until we've got there
@@ -76,34 +80,30 @@ void julia_gpu(int x_pixels, int y_pixels, cfloat c, float left_edge, float righ
 }
 
 __global__ void julia_gpu_kernel(int *res) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    auto width = edges[1] - edges[0];
-    auto height = edges[3] - edges[2];
+    int x = threadIdx.x + blockIdx.x * blockDim.x;
+    int y = threadIdx.y + blockIdx.y * blockDim.y;
+    int offset = x + y * n_pixels[0];
 
-    int x, y;
     float pos_x, pos_y, pos_x_tmp;
 
 
-    while (tid < n_pixels[0] * n_pixels[1]) {
+    if ((x < n_pixels[0]) && (y <= n_pixels[1])) {
         int count = 0;
         // This is real/imag in the normal version
         // The first part is the fraction along the image
-        x = tid % n_pixels[0];
-        y = tid / n_pixels[0];
-        pos_x = (float)x / n_pixels[0] * width + edges[0];
-        pos_y = (float)y / n_pixels[1] * height + edges[2];
+        pos_x = (float)x / n_pixels[0] * size[0] + edges[0];
+        pos_y = (float)y / n_pixels[1] * size[1] + edges[2];
 
         while(count < max_value_dev) {
-            pos_x_tmp = std::pow(pos_x, 2) - std::pow(pos_y, 2) + c_dev[0];
+            pos_x_tmp = pos_x * pos_x - pos_y * pos_y + c_dev[0];
             pos_y = 2 * pos_x * pos_y + c_dev[1];
             pos_x = pos_x_tmp;
-            if (std::pow(pos_x, 2) + std::pow(pos_y, 2) >= 4) {
+            if (pos_x * pos_x + pos_y * pos_y >= 4) {
                 break;
             }
             count++;
         }
-        res[tid] = count;
-        tid += blockDim.x * gridDim.x;
+        res[offset] = count;
     }
 }
 

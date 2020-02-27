@@ -1,5 +1,7 @@
 # GPU programming with CUDA
 
+Note that none of the cuda tools come with useful man pages, but they have great `--help` pages.
+
 ## Basic terminology
 
 Computation is either done on the `host` (the CPU) or a `device` (a CUDA enabled GPU).
@@ -17,6 +19,7 @@ If you compile a cuda object file `nvcc -c lib.cu -o lib.o` and want to link thi
 ### Useful flags
 * `nvcc --run file.cu`: Run it
 * `-g`: Adds debug info
+
 
 ### Debugging
 

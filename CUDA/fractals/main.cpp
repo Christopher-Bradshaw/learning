@@ -7,6 +7,7 @@
 int main(void) {
     cfloat c = {0.5, 0.4};
     int x_pixels = 4096, y_pixels = 4096;
+    /* int x_pixels = 1024, y_pixels = 1024; */
     int max_value = 200;
     // Allocate the result array
     int *res = (int *)calloc(x_pixels * y_pixels, sizeof(int));
