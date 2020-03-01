@@ -6,18 +6,35 @@ OpenGL libraries facilitate this - they provide high level abstractions (e.g. cr
 
 So, there are two levels. The low level openGL, which GPUs power. The high level library, which contains high level abstractions that are useful to programmers.
 
-
-## Hello world
-
-First, install `freeglut`. This is a C library that implements the openGL API. I'm not really sure...
-
+Check your OpenGL version with,
 ```
-apt install freeglut3-dev
+glxinfo | grep version
 ```
 
-Then compile, linking in the new libraries
+## Related toolkits
 
-```
-g++ hello_world.cpp -o hello_world -lglut -lGL
-```
+See [here](https://www.khronos.org/opengl/wiki/Related_toolkits_and_APIs)
+
+### Context/Window toolkits
+
+OpenGL provides ways to draw to an open window. But doesn't actually let you open a window! To do that there are a couple of libraries. See `freeglut` (the replacement for `glut` which is old) or `GLFW`.
+
+To install on debian, `apt install freeglut3-dev` or `apt install libglfw3-dev`.
+
+I'm going to use GLFW because apparently it is more fully features. I probably won't nede these so this might be silly. But their [docs](https://www.glfw.org/docs/latest/) also look pretty good.
+
+### Loading libraries
+
+IF you want more than just the core GL functionality, the ext are in separate headers/includes. Use `GLEW` to pull in everything that your system is capable of using.
+
+`apt install libglew-dev`
+
+
+## Open GL
+
+See [docs](https://www.khronos.org/registry/OpenGL-Refpages/gl4/) and the best [tutorial](https://learnopengl.com/)
+
+## What I want
+
+I don't actually care about most of what OpenGL does. I just want to work out how to paint a 2d array onto the screen...
 
