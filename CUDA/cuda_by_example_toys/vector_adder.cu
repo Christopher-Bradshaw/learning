@@ -5,10 +5,10 @@
 __global__ void add_block(int *res, int *a, int *b) {
     // blockIdx.x tells us which item this kernel is
     // blockIdx is a built in variable that the CUDA runtime defines.
-    int tid = blockIdx.x;
+    int bid = blockIdx.x;
     // We can even print it in here! No guarantee of order though
-    printf("%d\n", tid);
-    res[tid] = a[tid] + b[tid];
+    printf("%d\n", bid);
+    res[bid] = a[bid] + b[bid];
 }
 
 __global__ void add_thread(int *res, int *a, int *b) {

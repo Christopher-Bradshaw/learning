@@ -1,5 +1,7 @@
 # GPU programming with CUDA
 
+Note that none of the cuda tools come with useful man pages, but they have great `--help` pages.
+
 ## Basic terminology
 
 Computation is either done on the `host` (the CPU) or a `device` (a CUDA enabled GPU).
@@ -12,9 +14,12 @@ GPU's excel when the problem contains lots of *data parallelism*. See [the diffe
 
 Compile with `nvcc`. This appears to compile in C/C++ mode if the file extension is .c/.cpp. Make sure to have the extension of `.cu` if you want to compile the CUDA stuff! See [the docs](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#supported-input-file-suffixes)
 
+If you compile a cuda object file `nvcc -c lib.cu -o lib.o` and want to link this into your main project `clang++ main.o lib.o` you need to explicitly include the cuda library `-lcudart`.
+
 ### Useful flags
 * `nvcc --run file.cu`: Run it
 * `-g`: Adds debug info
+
 
 ### Debugging
 
