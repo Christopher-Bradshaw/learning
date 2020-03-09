@@ -9,12 +9,74 @@
     \item Outcome variable (output variable, target, response): Often written as $y$. Generally written as $y$ if the data has been observed, $\tilde{y}$ if it hasn't.
     \item Data: The combination of input and output variables that have been observed. $D = {(x_i, y_i)}$.
     \item Model: Some way (parametric or non) of relating the input and output variables. $y = M(x, \theta)$.
+\end{itemize}
+
+Probabilities
+\begin{itemize}
+    \item Conditional probability: The probability of some outcome (e.g. winning the game), given some other outcome (scoring three goals); $P(x | y)$.
+    \item Joint probability: The probability of both events occuring (e.g. winning the game {\bf and} scoring three goals); $P(x, y)$. Note
+        \begin{equation}
+            P(x, y) = P(x) P(y | x) = P(y) P(x | y)
+        \end{equation}
+        from which Bayes' theorem follows.
+
+\end{itemize}
+
+Basic Bayesian components
+\begin{itemize}
+    \item Bayes' rule: The posterior probability of some set of parameters is equal to the prior, $\pi$, multiplied by the likelihood, $\mathcal{L}$, scaled by the evidence, $\mathcal{Z}$.
+        \begin{equation}
+            P(\theta | D, M) = \frac{\mathcal{L(D | \theta, M)} \pi(\theta)}{\mathcal{Z}}
+        \end{equation}
+
+        Note that this can also be written less specifically as,
+        \begin{equation}
+            P(A | B) = \frac{P(B | A) P(A)}{P(B)}
+        \end{equation}
+
     \item Likelihood: The liklihood of the data given the model (M), its parameters ($\theta$); $\mathcal{L}(D | M, \theta)$
-    \item Prior probability distribution: The probability of the parameters ($\theta$) for the model, before conditioning on the data. This maybe be determined by previous work, or natural limit (some properties, such as variance, must be $> 0$).
+    \item Prior probability distribution: The probability of the parameters ($\pi(\theta$)) for the model, before conditioning on the data. This maybe be determined by previous work, or natural limit (some properties, such as variance, must be $> 0$).
     \item Posterior probability distribution: The probability of the parameters ($\theta$) for the model, given the data. $p(\theta | D, M)$
+    \item Evidence (model evidence, bayesian evidence, marginal liklihood): The probability of the data, marginalized (integrated) over the domain of the parameter space;
+        \begin{equation}
+            P(D | M) \equiv \mathcal{Z} = \int \mathcal{L}(D | \theta, M) \pi(\theta) d\theta
+        \end{equation}
+        Thinking of this as ``model evidence'' is nice! This is the total evidence for the model.
+        If we assume that the prior is normalized (integrates to 1), this can be thought of as the average, weighted by the prior.
+\end{itemize}
+
+Advanced Bayesian components
+
+\begin{itemize}
     \item Prior predictive distribution: The prediction if $y$ for $x$, given a model and a prior distribution over the parameters for that model. $p(y | x) = \int p(y | x, \theta) p(\theta) d\theta$.
+
     \item Posterior predictive distribution: The prediction of $\tilde{y}$ for $\tilde{x}$, given a model conditioned on some data; $p(\tilde{y} | \tilde{x}, D, M)$. In the process of conditioning on the data, we obtain a posterior on the model parameters. Thus, $p(\tilde{y} | \tilde{x}, D, M) = \int p(\tilde{y} | \tilde{x}, \theta, M) p(\theta | D, M) d\theta$, or the probaility of $\tilde{y}$ at a given $\theta$, weighted by the posterior probability of that $\theta$.
+
     \item Latent variable
+
+    \item Bayes Factor: The amount by which the data has changed our opinion about two models. For model comparison, we ask the question,
+        \begin{equation}
+            \frac{P(M_1 | D)}{P(M_2 | D)}
+        \end{equation}
+        We know from above that
+        \begin{equation}
+            \mathcal{Z} \equiv P(D | M)
+        \end{equation}
+        and so we just need to invert this conditional probability using bayes theorem.
+        \begin{equation}
+            P(M | D) = \frac{P(D | M) P(M)}{P(D)} = \frac{\mathcal{Z} P(M)}{P(D)}
+        \end{equation}
+
+        and so the ratio of probabilies we initially wanted to know about is (as the $P(D)$ cancels),
+        \begin{equation}
+            \frac{P(M_1 | D)}{P(M_2 | D)} = \frac{\mathcal{Z}_1 P(M_1)}{\mathcal{Z}_2 P(M_2)}
+        \end{equation}
+
+        where $P(M)$ is the prior on that model. Ignoring the priors, we get the Bayes Factor, which is just the ratio of evidences
+
+        \begin{equation}
+            K = \frac{\mathcal{Z}_1}{\mathcal{Z}_2}
+        \end{equation}
 \end{itemize}
 
 Let's give a full example. Consider subhalo abundance matching, a method of populating dark matter halos with stellar mass. Our target, $y$, is the stellar mass. We choose an explanatory variable (such as halo mass) that we thing correlates well (covaries) with this - this is $x$.
