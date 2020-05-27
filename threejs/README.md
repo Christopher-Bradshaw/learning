@@ -21,3 +21,7 @@
 ## Little useful things
 
 * positive x is to the right, positive y is up, positive z is out of the screen
+
+## Resources
+
+https://threejsfundamentals.org/threejs/lessons/threejs-fundamentals.html

@@ -4,7 +4,7 @@ module.exports = {
   mode: "development",
   entry: {
     scene1: "./src/scene1.js",
-    scene2: "./src/scene2.js",
+    solar_system: "./src/solar_system.js",
   },
   output: {
     filename: "[name].js",
