@@ -5,20 +5,7 @@ import { Planet } from "./solar_system_movement"
 const segs = 16;
 
 // The order of these needs to be
-// a, e, i, long asc node, arg of periapse, MA0
-
-// http://www.met.rdg.ac.uk/~ross/Astronomy/Planets.html
-// const orbital_elements = {
-//     "Mercury": [0.38709893, 0.20563069, 7.00487, 48.33167, 77.45645, 252.25084],
-//     "Venus": [0.72333199, 0.00677323, 3.39471, 76.68069, 131.53298, 181.97973],
-//     "Earth": [1.00000011, 0.01671022, 0.00005, -11.26064, 102.94719, 100.46435],
-//     "Mars": [1.52366231, 0.09341233, 1.85061, 49.57854, 336.04084, 355.45332],
-//     "Jupiter": [5.20336301, 0.04839266, 1.30530, 100.55615, 14.75385, 34.40438],
-//     "Saturn": [9.53707032, 0.05415060, 2.48446, 113.71504, 92.43194, 49.94432],
-//     "Uranus": [19.19126393, 0.04716771, 0.76986, 74.22988, 170.96424, 313.23218],
-//     "Neptune": [30.06896348, 0.00858587, 1.76917, 131.72169, 44.97135, 304.88003],
-//     "Pluto": [39.48168677, 0.24880766, 17.14175, 110.30347, 224.06676, 238.92881],
-// }
+// a, e, i, longitude of ascending node, longitude of periapse, mean longitude
 
 // https://ssd.jpl.nasa.gov/?bodies#elem and https://ssd.jpl.nasa.gov/txt/p_elem_t1.txt
 // Note that we slightly reorder the cols
@@ -36,6 +23,8 @@ const orbital_elements = {
 }
 
 
+// Sizes are in km. We convert to AU
+var km_in_au = 1.496e8
 const size = {
     "Sun": 696342,
     "Mercury": 2439.7,
@@ -48,9 +37,12 @@ const size = {
     "Neptune": 24622,
     "Pluto": 1188.3,
 }
-var km_in_au = 1.496e8
 for (var k of Object.keys(size)) {
     size[k] = size[k] / km_in_au;
+}
+const size_rings = {
+    // [inner_rad, outer_rad]
+    "Saturn": [70000/km_in_au, 150000/km_in_au],
 }
 
 // Some things to know about textures:
@@ -58,28 +50,55 @@ for (var k of Object.keys(size)) {
 // .shininess: How much specular highlight (mirror like reflection) there is. Large number - more shiny. Default is 30.
 
 function new_planet(name, size_scale) {
-    size_scale = size_scale || 1000;
-    return new Planet(
-        new THREE.Mesh(
-            new THREE.SphereGeometry(size[name]*size_scale, segs, segs),
+    size_scale = size_scale || 500;
+    const planet_texture = new THREE.TextureLoader().load(`../assets/${name}-small.jpg`);
+    planet_texture.mapping = THREE.EquirectangularReflectionMapping;
+    const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(size[name]*size_scale, segs, segs),
+        new THREE.MeshPhongMaterial({
+            reflectivity: 0.01,
+            map: planet_texture,
+            shininess: 10,
+        }),
+    );
+    // Should do this properly with the actual inclindation...
+    mesh.rotation.x = Math.PI/2 + 0.2;
+    const mesh_group = new THREE.Group();
+    mesh_group.add(mesh);
+
+    // This doesn't work at the moment, the texture is not applied around the ring, but across it
+    if (name == "Saturn") {
+        const ring_texture = new THREE.TextureLoader().load(`../assets/${name}_rings-small.jpg`);
+        const ring_mesh = new THREE.Mesh(
+            new THREE.RingGeometry(size_rings[name][0]*size_scale, size_rings[name][1]*size_scale, segs, segs),
             new THREE.MeshPhongMaterial({
-                reflectivity: 0.01,
-                map: new THREE.TextureLoader().load(`../assets/${name}-small.jpg`),
-                shininess: 10,
+                map: ring_texture,
+                side: THREE.DoubleSide,
             }),
-        ),
+        );
+        ring_mesh.rotation.x = 0.2;
+        mesh_group.add(ring_mesh);
+    }
+
+    return new Planet(
+        mesh_group,
         ...orbital_elements[name],
     )
 }
 
-var sun = new THREE.Mesh(
-    new THREE.SphereGeometry(size["Sun"], segs, segs),
-    new THREE.MeshPhongMaterial({
-        emissive: 0xffff00, // This needs to look yellow
-        emissiveMap: new THREE.TextureLoader().load("../assets/Sun-small.jpg"),
-        shininess: 0,
-    }),
-);
-var sun_light = new THREE.PointLight(0xffffff, 1, 100, 2);
+function create_sun(size_scale) {
+    size_scale = size_scale || 10;
+    var sun = new THREE.Mesh(
+        new THREE.SphereGeometry(size["Sun"] * size_scale, segs, segs),
+        new THREE.MeshPhongMaterial({
+            emissive: 0xffff00, // This needs to look yellow
+            emissiveMap: new THREE.TextureLoader().load("../assets/Sun-small.jpg"),
+            shininess: 0,
+        }),
+    );
+    sun.rotation.x = Math.PI/2;
+    var sun_light = new THREE.PointLight(0xffffff, 1, 100, 2);
+    return [sun, sun_light]
+}
 
-export { sun, sun_light, new_planet };
+export { create_sun, new_planet };

@@ -1,23 +1,31 @@
 import { nelderMead } from "fmin";
 
-var { cos, sin, tan, atan, PI, pow } = Math;
+var { cos, sin, PI, pow } = Math;
 const millis_per_year = 10 * 1000;
 
 class Planet {
     // a: semi-major axis (in AU)
     // e: eccentricity
     // i: inclination (from the reference (ecliptic/x-y) plane)
-    // omega: longitude of ascending node. The angle from the reference direction (x axis), along the reference plane, to the ascending node
-    // w: argument of periapse. The angle from the ascending node (in the plane of the orbit) to periapse
-    // MA0: mean anomaly at t=0. The angle between periapse and the current position. Not a true angle
-    constructor(mesh, a, e, i, omega, w, MA0) {
+    // long_asc (omega): longitude of ascending node. The angle from the reference direction (x axis), along the reference plane, to the ascending node
+    // long_peri (w): longitude of periapse. The angle from the reference direction to periapse
+    // ML0: mean longitude (from the reference position) at t=0.
+    // We mostly follow https://ssd.jpl.nasa.gov/txt/aprx_pos_planets.pdf
+    constructor(mesh, a, e, i, long_asc, long_peri, ML0) {
+
         this.mesh = mesh;
         this.a = a;
         this.e = e;
         this.i = this._deg_to_rad(i);
-        this.omega = this._deg_to_rad(omega);
-        this.w = this._deg_to_rad(w);
-        this.MA0 = this._deg_to_rad(MA0);
+        this.long_asc = this._deg_to_rad(long_asc);
+        this.long_peri = this._deg_to_rad(long_peri);
+        // This is the angle between the ascending node and periapse
+        this.arg_peri = (this.long_peri - this.long_asc) % (2*PI);
+        // Mean anomaly (MA) is the angle from periapse.
+        // To go from ML (mean longitude, angle from ref) to MA (mean anomaly, angle from peri)
+        // L = long_peri + MA (ref-asc + asc-peri + peri-pos)
+        this.MA0 = (this._deg_to_rad(ML0) - this.long_peri) % (2*PI);
+
         // t: period (in years)
         this.t = pow(this.a, 3/2);
 
@@ -32,9 +40,7 @@ class Planet {
     update_position(time) {
         const MA = this._compute_mean_anomaly(time);
         const EA = this._compute_eccentric_anomaly(MA);
-        const TA = this._compute_true_anomaly(EA);
-        const r = this._compute_radius(EA);
-        const [x, y, z] = this._compute_xyz(r, TA);
+        const [x, y, z] = this._compute_xyz(EA);
 
         if (time - this.t_last_print > 1000) {
             // console.log(time, MA, EA, r, x, y, z);
@@ -44,10 +50,7 @@ class Planet {
     }
 
     _compute_mean_anomaly(time) {
-        // Starting from the reference angle, the position at t0 is the sum of,
-        // ref to asc (omega), asc to per (w), peri to position (MA0)
-        const ang0 = this.MA0 - this.w - this.omega;
-        return (ang0 + 2*PI * time / (this.t * millis_per_year)) % (2*PI);
+        return (this.MA0 + 2*PI * time / (this.t * millis_per_year)) % (2*PI);
     }
 
     // The EA is related to the MA by,
@@ -61,32 +64,25 @@ class Planet {
         return nelderMead(f, [MA]).x[0];
     }
 
-    _compute_true_anomaly(EA) {
-        return 2 * atan(pow((1 + this.e) / (1 - this.e), 0.5) * tan(EA/2));
-    }
-
     _compute_radius(EA) {
         return this.a * (1 - this.e * cos(EA));
     }
 
-    _compute_xyz(r, TA) {
-        var x = r * (
-            cos(this.omega) * cos(this.w + TA) -
-            sin(this.omega) * sin(this.w + TA)*cos(this.i)
-        )
-        var y = r * (
-            sin(this.omega) * cos(this.w + TA) +
-            cos(this.omega) * sin(this.w + TA)*cos(this.i)
-        )
-        var z = r * (
-            sin(this.i) * sin(this.w + TA)
-        )
-
+    _compute_xyz(EA) {
+        // First the positions in the plane of the orbit with the x axis towards the perihelion
+        const xp = this.a * (cos(EA) - this.e);
+        const yp = this.a * pow((1 - pow(this.e, 2)), 0.5) * sin(EA);
+        // Now in the plane of the ecliptic, with the x axis towards the march equinox
+        const x = xp * (cos(this.arg_peri) * cos(this.long_asc) - sin(this.arg_peri) * sin(this.long_asc) * cos(this.i)) -
+            yp * (sin(this.arg_peri) * cos(this.long_asc) + cos(this.arg_peri) * sin(this.long_asc) * cos(this.i));
+        const y = xp * (cos(this.arg_peri) * sin(this.long_asc) + sin(this.arg_peri) * cos(this.long_asc) * cos(this.i)) +
+            yp * (-sin(this.arg_peri) * sin(this.long_asc) + cos(this.arg_peri) * cos(this.long_asc) * cos(this.i));
+        const z = xp * (sin(this.arg_peri) * sin(this.i)) + yp * (cos(this.arg_peri) * sin(this.i))
         return [x, y, z];
     }
 
     _deg_to_rad(deg) {
-        return deg * PI / 180;
+        return (deg * PI / 180) % (2*PI);
     }
 
 }
