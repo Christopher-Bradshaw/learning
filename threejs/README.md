@@ -18,6 +18,10 @@
 
 * Then go create the [webpack config](./webpack.config.js). You can now just run `webpack --watch`.
 
+### Local server
+
+I just edit `index.html` to include the right `./dist/xxx.js` file. Then spin up a local server with python.
+
 ## Little useful things
 
 * positive x is to the right, positive y is up, positive z is out of the screen
