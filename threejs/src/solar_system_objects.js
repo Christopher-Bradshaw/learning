@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { Planet } from "./solar_system_movement"
+import { arrarr_to_vecarr } from "./three_helpers";
 
 // Number of segments on our spheres
 const segs = 16;
@@ -22,6 +23,8 @@ const orbital_elements = {
     "Pluto":   [39.48211675,      0.24882730,     17.14001206,    110.30393684,      224.06891629,    238.92903833],
 }
 
+// Further than any planets. We will stop the sun from reaching here
+const bg_dist = 50;
 
 // Sizes are in km. We convert to AU
 var km_in_au = 1.496e8
@@ -48,6 +51,17 @@ const size_rings = {
 // Some things to know about textures:
 // .map: The color map. This is modulated by the diffuse .color. So, if we have the color that we want in the map, set color to white (which it is by default).
 // .shininess: How much specular highlight (mirror like reflection) there is. Large number - more shiny. Default is 30.
+
+function new_trace_line(planet) {
+    var line = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(arrarr_to_vecarr(planet.trace_points)),
+        new THREE.LineBasicMaterial({
+            color: 0x0000ff,
+            linewidth: 2.5,
+        }),
+    )
+    return line;
+}
 
 function new_planet(name, size_scale) {
     size_scale = size_scale || 500;
@@ -83,6 +97,7 @@ function new_planet(name, size_scale) {
     return new Planet(
         mesh_group,
         ...orbital_elements[name],
+        {"show_trace": true},
     )
 }
 
@@ -97,8 +112,24 @@ function create_sun(size_scale) {
         }),
     );
     sun.rotation.x = Math.PI/2;
-    var sun_light = new THREE.PointLight(0xffffff, 1, 100, 2);
+    var sun_light = new THREE.PointLight(0xffffff, 1, bg_dist - 1, 2);
     return [sun, sun_light]
 }
 
-export { create_sun, new_planet };
+function create_background_stars() {
+    var bg_texture = new THREE.TextureLoader().load("../assets/Stars2.jpg");
+    bg_texture.mapping = THREE.EquirectangularReflectionMapping;
+    var bg = new THREE.Mesh(
+        new THREE.SphereGeometry(bg_dist, segs*4, segs*4),
+        new THREE.MeshPhongMaterial({
+            emissive: 0xffffff,
+            emissiveMap: bg_texture,
+            emissiveIntensity: 1,
+            side: THREE.BackSide,
+        }),
+    );
+    bg.rotation.x = Math.PI/2;
+    return bg;
+}
+
+export { create_background_stars, create_sun, new_planet, new_trace_line };

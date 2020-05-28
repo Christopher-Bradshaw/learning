@@ -1,7 +1,7 @@
 import { nelderMead } from "fmin";
 
 var { cos, sin, PI, pow } = Math;
-const millis_per_year = 10 * 1000;
+const millis_per_year = 30 * 1000;
 
 class Planet {
     // a: semi-major axis (in AU)
@@ -11,8 +11,7 @@ class Planet {
     // long_peri (w): longitude of periapse. The angle from the reference direction to periapse
     // ML0: mean longitude (from the reference position) at t=0.
     // We mostly follow https://ssd.jpl.nasa.gov/txt/aprx_pos_planets.pdf
-    constructor(mesh, a, e, i, long_asc, long_peri, ML0) {
-
+    constructor(mesh, a, e, i, long_asc, long_peri, ML0, options) {
         this.mesh = mesh;
         this.a = a;
         this.e = e;
@@ -29,24 +28,42 @@ class Planet {
         // t: period (in years)
         this.t = pow(this.a, 3/2);
 
-        // TMP
-        this.t_last_print = 0;
+        this.handle_options(options);
 
         // Set the initial position
         this.update_position(0);
+        this.update_trace_points(0);
     }
 
+    handle_options(options) {
+        if (options === undefined) {
+            options = {};
+        }
+        this.show_trace = options["show_trace"] || false;
+    }
+
+    update_trace_points(t_now) {
+        const [trace_length_years, n_trace_points] = [0.2, 10];
+        const trace_length_millis = trace_length_years * millis_per_year;
+        const dt = trace_length_millis / n_trace_points;
+
+        var trace_points = [];
+        for (var i = 0; i < n_trace_points; i++) {
+            trace_points.push(this.get_position(t_now - dt * i));
+        }
+        this.trace_points = trace_points;
+    }
 
     update_position(time) {
+        const [x, y, z] = this.get_position(time);
+        this.update_trace_points(time);
+        this.mesh.position.set(x, y, z);
+    }
+
+    get_position(time) {
         const MA = this._compute_mean_anomaly(time);
         const EA = this._compute_eccentric_anomaly(MA);
-        const [x, y, z] = this._compute_xyz(EA);
-
-        if (time - this.t_last_print > 1000) {
-            // console.log(time, MA, EA, r, x, y, z);
-            this.t_last_print = time;
-        }
-        this.mesh.position.set(x, y, z);
+        return this._compute_xyz(EA);
     }
 
     _compute_mean_anomaly(time) {

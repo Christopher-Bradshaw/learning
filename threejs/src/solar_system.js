@@ -1,8 +1,10 @@
 import * as THREE from "three";
-import { create_sun, new_planet } from "./solar_system_objects";
+import { create_background_stars, create_sun, new_planet, new_trace_line } from "./solar_system_objects";
 import { millis_per_year } from "./solar_system_movement";
+import { arrarr_to_vecarr } from "./three_helpers";
 
 THREE.Object3D.DefaultUp = new THREE.Vector3(0, 0, 1);
+trace_lines = false;
 
 // Renderer
 var canvas = document.getElementById("threeCanvas");
@@ -23,40 +25,45 @@ scene.add(axesHelper);
 const [sun, sun_light] = create_sun();
 sun.position.set(0, 0, 0);
 sun_light.position.set(0, 0, 0);
-var planets = {
-    "Mercury": new_planet("Mercury"),
-    "Venus": new_planet("Venus"),
-    "Earth": new_planet("Earth"),
-    "Mars": new_planet("Mars"),
-    "Jupiter": new_planet("Jupiter"),
-    "Saturn": new_planet("Saturn"),
-    "Uranus": new_planet("Uranus"),
-    "Neptune": new_planet("Neptune"),
-};
 scene.add(sun, sun_light);
+
+var which_planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"];
+var planets = which_planets.reduce(function (res, pl) { res[pl] = new_planet(pl); return res; }, {})
 for (var pl of Object.values(planets)) {
-    console.log(pl);
     scene.add(pl.mesh);
 }
+if (trace_lines) {
+    var trace_lines = which_planets.reduce(function (res, pl) { res[pl] = new_trace_line(planets[pl]); return res; }, {})
+    for (var tl of Object.values(trace_lines)) {
+        scene.add(tl);
+    }
+}
+
+var bg = create_background_stars();
+scene.add(bg);
 
 // Camera
 var camera = new THREE.PerspectiveCamera(
-    60, // Vertical fov in degrees
-    2, // Aspect ratio (width/height)
+    80, // Vertical fov in degrees
+    1280/960, // Aspect ratio (width/height)
     0.01, // Near plane
     1000, // Far plane (things beyond this are not seen)
 );
-// camera.position.z = 15;
-// camera.position.x = 4;
+// camera.position.x = 2;
 
 var animate = function (t) {
     if (paused) {
         return;
     }
 
-    for (var pl of Object.values(planets)) {
-        pl.update_position(t);
+    for (var pl of which_planets) {
+        planets[pl].update_position(t);
+        if (trace_lines) {
+            trace_lines[pl].geometry.setFromPoints(arrarr_to_vecarr(planets[pl].trace_points));
+            trace_lines[pl].geometry.verticesNeedUpdate = true;
+        }
     }
+
     camera.position.set(
         ...Object.values(planets["Earth"].mesh.position)
     );
