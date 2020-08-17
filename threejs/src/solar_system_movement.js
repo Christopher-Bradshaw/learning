@@ -1,7 +1,7 @@
 import { nelderMead } from "fmin";
 
 var { cos, sin, PI, pow } = Math;
-const millis_per_year = 30 * 1000;
+const millis_per_year = 10 * 1000;
 
 class Planet {
     // a: semi-major axis (in AU)

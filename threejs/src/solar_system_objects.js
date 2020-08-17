@@ -28,7 +28,7 @@ const bg_dist = 50;
 
 // Sizes are in km. We convert to AU
 var km_in_au = 1.496e8
-const size = {
+const sizes = {
     "Sun": 696342,
     "Mercury": 2439.7,
     "Venus": 6051.8,
@@ -40,8 +40,8 @@ const size = {
     "Neptune": 24622,
     "Pluto": 1188.3,
 }
-for (var k of Object.keys(size)) {
-    size[k] = size[k] / km_in_au;
+for (var k of Object.keys(sizes)) {
+    sizes[k] = sizes[k] / km_in_au;
 }
 const size_rings = {
     // [inner_rad, outer_rad]
@@ -63,18 +63,21 @@ function new_trace_line(planet) {
     return line;
 }
 
+var shared_sphere_geometry = new THREE.SphereBufferGeometry(1, segs, segs);
+
 function new_planet(name, size_scale) {
-    size_scale = size_scale || 500;
     const planet_texture = new THREE.TextureLoader().load(`../assets/${name}-small.jpg`);
     planet_texture.mapping = THREE.EquirectangularReflectionMapping;
     const mesh = new THREE.Mesh(
-        new THREE.SphereGeometry(size[name]*size_scale, segs, segs),
+        shared_sphere_geometry,
         new THREE.MeshPhongMaterial({
             reflectivity: 0.01,
             map: planet_texture,
             shininess: 10,
         }),
     );
+    const size = sizes[name] * (size_scale || 500);
+    mesh.scale.set(size, size, size);
     // Should do this properly with the actual inclindation...
     mesh.rotation.x = Math.PI/2 + 0.2;
     const mesh_group = new THREE.Group();
@@ -84,7 +87,9 @@ function new_planet(name, size_scale) {
     if (name == "Saturn") {
         const ring_texture = new THREE.TextureLoader().load(`../assets/${name}_rings-small.jpg`);
         const ring_mesh = new THREE.Mesh(
-            new THREE.RingGeometry(size_rings[name][0]*size_scale, size_rings[name][1]*size_scale, segs, segs),
+            new THREE.RingBufferGeometry(
+                size_rings[name][0]*size_scale, size_rings[name][1]*size_scale, segs, segs
+            ),
             new THREE.MeshPhongMaterial({
                 map: ring_texture,
                 side: THREE.DoubleSide,
@@ -102,18 +107,19 @@ function new_planet(name, size_scale) {
 }
 
 function create_sun(size_scale) {
-    size_scale = size_scale || 10;
-    var sun = new THREE.Mesh(
-        new THREE.SphereGeometry(size["Sun"] * size_scale, segs, segs),
+    var mesh = new THREE.Mesh(
+        shared_sphere_geometry,
         new THREE.MeshPhongMaterial({
             emissive: 0xffff00, // This needs to look yellow
             emissiveMap: new THREE.TextureLoader().load("../assets/Sun-small.jpg"),
             shininess: 0,
         }),
     );
-    sun.rotation.x = Math.PI/2;
+    const size = sizes["Sun"] * (size_scale || 10);
+    mesh.scale.set(size, size, size);
+    mesh.rotation.x = Math.PI/2;
     var sun_light = new THREE.PointLight(0xffffff, 1, bg_dist - 1, 2);
-    return [sun, sun_light]
+    return [mesh, sun_light]
 }
 
 function create_background_stars() {
