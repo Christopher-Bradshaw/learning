@@ -13,3 +13,7 @@ If you just want a static line plot -- D3 is probably overkill. Use another nice
 * `hello_world.html`: Very basic first example. Adding/selecting/modifying dom elements.
 * `hello_world_svg.html`: Move things around a svg
 * `cities.html`:
+
+## Resources
+
+* [styled-axes](https://observablehq.com/@d3/styled-axes)
