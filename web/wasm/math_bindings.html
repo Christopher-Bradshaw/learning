@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <script src="./math_bindings.js"></script>
+    <script>
+        // So that this only runs after the imports happen
+        setTimeout(
+            () => {
+                const { add } = Module;
+                console.log(add(1, 2));
+            },
+            1000,
+        )
+
+    </script>
+  </body>
+</html>
+
+
