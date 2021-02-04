@@ -46,17 +46,70 @@ Consider the system of,
     \end{bmatrix}
 \end{align}
 
-\noindent The solution to differential equations of the form $\dot{x} = Ax$ is $x = e^{At}$.
-This is true even when A is a matrix. However, the value of this exponent is found from the sum of an \href{https://en.wikipedia.org/wiki/Matrix_exponential}{infinite power series}.
+\noindent The solution to differential equations of the form $\dot{x} = Ax$ is $x = Ce^{At}$ where $C$ is some constant.
+This is true even when A is a matrix, though in this case $C$ becomes a vector.
+The value of this exponent is found from the sum of an \href{https://en.wikipedia.org/wiki/Matrix_exponential}{infinite power series}.
 
 \begin{equation}
-    e^A = \sum_{k=0}^{\infty} \frac{1}{k!} A^k
+    e^{At} = \sum_{k=0}^{\infty} \frac{(At)^k}{k!} = I + At + \frac{(At)^2}{2} + \ldots{}
 \end{equation}
 
-\noindent This reduces to the expected $e^a$ when $A$ is a $1 \times 1$ matrix with value $a$. See the \href{https://en.wikipedia.org/wiki/Exponential_function#Formal_definition}{exponential function}.
+\noindent This is not a special case for the exponentiation of a matrix, but just an extension of the definition of the \href{https://en.wikipedia.org/wiki/Exponential_function#Formal_definition}{exponential function}.
 
 \begin{equation}
     e^a = \sum_{k=0}^{\infty} \frac{a^k}{k!} = 1 + a + \frac{a^2}{2} + \frac{a^3}{6} + \ldots{}
+\end{equation}
+
+\noindent for the case of $A$ above, $e^{At}$ evaluates to,
+
+\begin{equation}
+    \begin{bmatrix}
+        \cos(t) & \sin(t) \\
+        -\sin(t) & \cos(t)
+    \end{bmatrix}
+\end{equation}
+
+\noindent and so we have
+
+\begin{equation}
+    x = \begin{bmatrix}
+        \cos(t) & \sin(t) \\
+        -\sin(t) & \cos(t)
+    \end{bmatrix}
+    \begin{bmatrix}
+        C_1 \\
+        C_2
+    \end{bmatrix}
+\end{equation}
+
+\noindent How do we choose $C$? For that we need the initial conditions. Let's say that,
+
+\begin{equation}
+x(0) \equiv x_0 =
+    \begin{bmatrix}
+        1 \\
+        2
+    \end{bmatrix}
+\end{equation}
+
+\noindent This gives us the set of equations,
+
+\begin{align}
+    x_1 &= C_1 \cos(t) + C_2 \sin(t) = 1 \\
+    x_2 &= C_2 \cos(t) - C_1 \sin(t) = 2
+\end{align}
+
+\noindent which at $t = 0$ gives us, $C_1 = 1$, $C_2 = 2$. So,
+
+\begin{equation}
+    x = \begin{bmatrix}
+        \cos(t) & \sin(t) \\
+        -\sin(t) & \cos(t)
+    \end{bmatrix}
+    \begin{bmatrix}
+        1 \\
+        2
+    \end{bmatrix}
 \end{equation}
 
 \end{document}
