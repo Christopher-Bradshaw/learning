@@ -3,6 +3,7 @@
 ## Compilation
 
 Emscripten is a backend to LLVM that outputs [asm.js](https://en.wikipedia.org/wiki/Asm.js) (which is deprecated and so we don't want to use) or [WebAssembly (wasm)](https://en.wikipedia.org/wiki/WebAssembly). What this means is that, if we have some code that we can compile to LLVM (e.g. C, Rust, etc) emscripten can take that code to wasm.
+Pretty much everything I do here assumes you are starting from C++.
 
 Clang also has wasm as a target. I needed to install `lld` to get `wasm-ld` to compile with clang.
 
@@ -223,3 +224,90 @@ console.log(gslModule.bessel_J0(5));
 ## Optimizations
 
 We should think about this!
+
+## Arrays
+
+These are a bit complicated. By default, emscripten only knows about [certain basic types](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#built-in-type-conversions). Passing these around is fairly simple as they are passed by value. Passing arrays by reference (pointer) brings up questions to memory ownership. I also don't think that wasm has access to the general javascript memory space.
+I'm still not sure on all the details here. But here are some things that work.
+
+
+### Returning an array
+
+If we want to allocate and return a typed array from C++, we can do it like this.
+
+```
+#include <emscripten/val.h>
+
+emscripten::val floatArrayGen() {
+    size_t bufferLength = 10;
+    float *buf = (float *)malloc(bufferLength);
+
+    for (int i = 0; i < bufferLength; ++i) {
+        buf[i] = i;
+    }
+
+    return emscripten::val(emscripten::typed_memory_view(bufferLength, buf));
+}
+```
+
+### Passing an array
+
+First we need to construct the array in JS and place it in the WASM heap.
+
+```
+// Setup array in javascript
+const bytesPerElem = 4;
+const arr = new Float32Array([1,2,3]);
+
+// Copy array into the wasm heap. This pointer is the number of *bytes* into the
+// correct array the memory will be stored at. I am pretty sure that WASM just has
+// a single heap and HEAPF32, HEAP8, HEAP16, etc are just views into this heap.
+// So, malloc doesn't know which of these to allocate into. It just knows what
+// part of the underlying memory is free.
+const bufferPtr = gsl._malloc(arr.length * bytesPerElem);
+gsl.HEAPF32.set(arr, bufferPtr / bytesPerElem);
+
+// Sanity check that it is there!
+console.log(gsl.HEAPF32.slice(bufferPtr / bytesPerElem, arr.length + bufferPtr / bytesPerElem));
+
+// Call a function
+useFloatArray(bufferPtr, bufferPtr + arr.length);
+```
+
+Then we need to access this memory in the C++.
+
+```
+void useFloatArray(int bufferPtr, int bufferSize) {
+    // This was total black magic when I first saw it. But it actually makes sense.
+    // bufferPtr is, in JS land, an integer index of the number of bytes into the
+    // heap our data is stored. We can't pass this as a float* for reasons I don't
+    // fully understand, but we get an error. However, here we reinterpret that
+    // integer as a float*! We also pass the bufferSize, else we would have no idea
+    // how much memory we have allocated!
+    float *buf = reinterpret_cast<float *>(bufferPtr);
+
+    // Do stuff with buf
+
+    // We could return a typed array here as shown previously. Or we can do that
+    // once we are back in the JS
+}
+```
+
+### Shared vector
+
+I don't understand this! It was in some github issue.
+```
+// Creates a vec whose memory looks at the input arr? I think?
+// https://github.com/emscripten-core/emscripten/issues/5519
+template<typename T>
+void typedArrayToVector(const emscripten::val arr, std::vector<T> &vec) {
+    unsigned int length = arr["length"].as<unsigned int>();
+    emscripten::val memory = emscripten::val::module_property("buffer");
+
+    vec.reserve(length);
+
+    emscripten::val memoryView = arr["constructor"].new_(memory, reinterpret_cast<uintptr_t>(vec.data()), length);
+
+    memoryView.call<void>("set", arr);
+}
+```

@@ -1,0 +1,62 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+
+\begin{document}
+\noindent\makebox[\textwidth][c]{\Large\bfseries Linear Systems}
+
+\section{Basics}
+
+Consider the system of,
+
+\begin{align}
+    y_1 &= 2x_1 + x_2 \\
+    y_2 &= 2x_2
+\end{align}
+
+\noindent This can be written as,
+
+\begin{align}
+    y &= Ax \\
+    A &=
+    \begin{bmatrix}
+        2 & 1 \\
+        0 & 2
+    \end{bmatrix}
+\end{align}
+
+\section{Differential Equations}
+
+Consider the system of,
+
+\begin{align}
+    \dot{x} &= y \\
+    \dot{y} &= -x
+\end{align}
+
+\noindent which as above is (writing $x$ as a vector now, where $x_1 = x$ and $x_2 = y$ above),
+
+\begin{align}
+    \dot{x} &= Ax \\
+    A &=
+    \begin{bmatrix}
+        0 & 1 \\
+        -1 & 0
+    \end{bmatrix}
+\end{align}
+
+\noindent The solution to differential equations of the form $\dot{x} = Ax$ is $x = e^{At}$.
+This is true even when A is a matrix. However, the value of this exponent is found from the sum of an \href{https://en.wikipedia.org/wiki/Matrix_exponential}{infinite power series}.
+
+\begin{equation}
+    e^A = \sum_{k=0}^{\infty} \frac{1}{k!} A^k
+\end{equation}
+
+\noindent This reduces to the expected $e^a$ when $A$ is a $1 \times 1$ matrix with value $a$. See the \href{https://en.wikipedia.org/wiki/Exponential_function#Formal_definition}{exponential function}.
+
+\begin{equation}
+    e^a = \sum_{k=0}^{\infty} \frac{a^k}{k!} = 1 + a + \frac{a^2}{2} + \frac{a^3}{6} + \ldots{}
+\end{equation}
+
+\end{document}
