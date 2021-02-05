@@ -92,14 +92,14 @@ x(0) \equiv x_0 =
     \end{bmatrix}
 \end{equation}
 
-\noindent This gives us the set of equations,
+\noindent This gives us the set of equations at $t = 0$,
 
 \begin{align}
-    x_1 &= C_1 \cos(t) + C_2 \sin(t) = 1 \\
-    x_2 &= C_2 \cos(t) - C_1 \sin(t) = 2
+    x_1 &= C_1 \cos(0) + C_2 \sin(0) = 1 \\
+    x_2 &= C_2 \cos(0) - C_1 \sin(0) = 2
 \end{align}
 
-\noindent which at $t = 0$ gives us, $C_1 = 1$, $C_2 = 2$. So,
+\noindent which we can solve for $C_1 = 1$, $C_2 = 2$. So,
 
 \begin{equation}
     x = \begin{bmatrix}
@@ -111,5 +111,7 @@ x(0) \equiv x_0 =
         2
     \end{bmatrix}
 \end{equation}
+
+\noindent This was a bit easier than the totally general case as the eigenvectors of $E^{At}$ at $t = 0$ are along the axes.
 
 \end{document}
