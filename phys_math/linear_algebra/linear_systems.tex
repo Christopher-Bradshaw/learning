@@ -26,7 +26,7 @@ Consider the system of,
     \end{bmatrix}
 \end{align}
 
-\section{Differential Equations}
+\section{Simple Differential Equations}
 
 Consider the system of,
 
@@ -113,5 +113,52 @@ x(0) \equiv x_0 =
 \end{equation}
 
 \noindent This was a bit easier than the totally general case as the eigenvectors of $E^{At}$ at $t = 0$ are along the axes.
+
+\section{Diagonalizable Differential Equations}
+
+Assume that we have $\dot{x} = Ax$ where $A$ is diagonizable, i.e., we can write it as $A = P^{-1}DP$ where $D$ is a diagonal matrix,
+
+\begin{equation}
+    D = \begin{bmatrix}
+        \lambda_1 & & \\
+                  & \ddots{} & \\
+                  & & \lambda_n
+    \end{bmatrix}
+\end{equation}
+
+\noindent We can then define $P u = x$, which allows us to say,
+
+\begin{align}
+    \dot{x} &= P \dot{u} &&\text{LHS} \\
+    P^{-1}DP x &= DP u  &&\text{RHS} \\
+    \dot{u} &= Du &&\text{}
+\end{align}
+
+\noindent which is the simple decoupled system,
+
+\begin{align}
+    \dot{u}_1 &= \lambda_1 u_1 \\
+              & \dots{} \\
+    \dot{u}_n &= \lambda_n u_n \\
+\end{align}
+
+\noindent which has the solution,
+
+$$
+u_i = C_i e^{\lambda_i t}
+$$
+
+\noindent and can be converted back to x using,
+
+$$
+x = P \begin{bmatrix}
+    C_1 e^{\lambda_1 t} \\
+    \dots \\
+    C_n e^{\lambda_n t} \\
+\end{bmatrix}
+$$
+
+
+See \href{http://people.math.gatech.edu/~xchen/teach/ode/HomogSys.pdf}{notes}
 
 \end{document}
