@@ -160,7 +160,9 @@ clang -lgsl -lgslcblas -lm gsl.c -o gsl
 ./gsl
 ```
 
-Sweet! We have an output we can sanity check against. To compile with emscripten, we need to follow a fairly similar procedure. However, we need to compile everything with emscripten (note that emscripten seems to be 32 bit and so I needed the 32 glibc libraries). So, again,
+Sweet! We have an output we can sanity check against. To compile with emscripten, we need to follow a fairly similar procedure. However, we need to compile everything with emscripten (note that emscripten seems to be 32 bit and so I needed the 32 glibc libraries).
+If you don't do this, you will get an error like, `wasm-ld: error: unknown file type: XXX.o`.
+So, again,
 
 ```
 git clone git://git.savannah.gnu.org/gsl.git gsl-lib

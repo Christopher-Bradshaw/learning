@@ -3,6 +3,7 @@
 \usepackage{hyperref}
 
 \newcommand{\norm}[1]{\ensuremath{\left\vert #1 \right \vert}}
+\newcommand{\vb}[1]{\ensuremath{\mathbf{#1}}}
 
 \begin{document}
 \noindent\makebox[\textwidth][c]{\Large\bfseries Three Body Problem}
@@ -13,27 +14,46 @@ We can use Newton's second law to set up a system of differential equations,
 
 \begin{align}
     F_{\text grav} &= \frac{GMm}{r^2} \hat{r} \\
-    m\ddot{r} &= \frac{GMm}{r^2} \hat{r} \\
+    m\ddot{r} &= \frac{GMm}{r^2} \hat{r}
 \end{align}
 
 \noindent Which for each body results in something like this,
 
 \begin{equation}
-    \ddot{r}_1 = -Gm_2\frac{r_1 - r_2}{\norm{r_1 - r_2}^3} - Gm_3\frac{r_1 - r_3}{\norm{r_1 - r_3}^3}
+    \vb{\ddot{r}_1} = -Gm_2\frac{\vb{r_1} - \vb{r_2}}{\norm{\vb{r_1} - \vb{r_2}}^3} - Gm_3\frac{\vb{r_1} - \vb{r_3}}{\norm{\vb{r_1} - \vb{r_3}}^3}
 \end{equation}
 
 \noindent Giving us 9 second order differential equations; 1 for each component ($x, y, z$) of each of the three bodies.
 
+\begin{equation}
+    \ddot{x}_1 = -Gm_2\frac{x_1 - x_2}{\norm{\vb{r_1} - \vb{r_2}}^3} - Gm_3\frac{x_1 - x_3}{\norm{\vb{r_1} - \vb{r_3}}^3}
+\end{equation}
 
 We can instead choose to work with 18 first order differential equations by adding a velocity like variable, $v = \dot{r}$.
 
 \begin{align}
-    \dot{r}_1 &= v_1 \\
-    \dot{v}_1 &= -Gm_2\frac{r_1 - r_2}{\norm{r_1 - r_2}^3} - Gm_3\frac{r_1 - r_3}{\norm{r_1 - r_3}^3}
+    \dot{r}_{x, 1} &= v_{x, 1} \\
+    \dot{v}_{x, 1} &= -Gm_2\frac{x_1 - x_2}{\norm{\vb{r_1} - \vb{r_2}}^3} - Gm_3\frac{x_1 - x_3}{\norm{\vb{r_1} - \vb{r_3}}^3}
 \end{align}
 
 \section{Hamiltonian Formulation}
 
 In practice, the 18 differential eqautions we use are from the Hamiltonian, $\mathcal{H}$.
+
+\begin{equation}
+\mathcal{H} = - \frac{G m_1 m_2}{\norm{\vb{r_1} - \vb{r_2}}}
+                - \frac{G m_1 m_3}{\norm{\vb{r_1} - \vb{r_3}}}
+                - \frac{G m_2 m_3}{\norm{\vb{r_2} - \vb{r_3}}}
+                + \frac{\vb{p_1^2}}{2 m_1}
+                + \frac{\vb{p_2^2}}{2 m_2}
+                + \frac{\vb{p_3^2}}{2 m_3}
+\end{equation}
+
+\noindent which is the total mechanical energy in the system (potential + kinetic). The relevant equations in this formulation are,
+
+\begin{align}
+    \vb{\dot{r}_1} &= \frac{d \mathcal{H}}{d \vb{p_1}} = \vb{v_1} \\
+    \vb{\dot{p}_1} &= - \frac{d \mathcal{H}}{d \vb{r}_1} = \frac{G m_1 m_2}{ \norm{\vb{r_1} - \vb{r_2}}^2 }\\
+\end{align}
 
 \end{document}
