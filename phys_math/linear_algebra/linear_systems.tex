@@ -1,0 +1,164 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+
+\begin{document}
+\noindent\makebox[\textwidth][c]{\Large\bfseries Linear Systems}
+
+\section{Basics}
+
+Consider the system of,
+
+\begin{align}
+    y_1 &= 2x_1 + x_2 \\
+    y_2 &= 2x_2
+\end{align}
+
+\noindent This can be written as,
+
+\begin{align}
+    y &= Ax \\
+    A &=
+    \begin{bmatrix}
+        2 & 1 \\
+        0 & 2
+    \end{bmatrix}
+\end{align}
+
+\section{Simple Differential Equations}
+
+Consider the system of,
+
+\begin{align}
+    \dot{x} &= y \\
+    \dot{y} &= -x
+\end{align}
+
+\noindent which as above is (writing $x$ as a vector now, where $x_1 = x$ and $x_2 = y$ above),
+
+\begin{align}
+    \dot{x} &= Ax \\
+    A &=
+    \begin{bmatrix}
+        0 & 1 \\
+        -1 & 0
+    \end{bmatrix}
+\end{align}
+
+\noindent The solution to differential equations of the form $\dot{x} = Ax$ is $x = Ce^{At}$ where $C$ is some constant.
+This is true even when A is a matrix, though in this case $C$ becomes a vector.
+The value of this exponent is found from the sum of an \href{https://en.wikipedia.org/wiki/Matrix_exponential}{infinite power series}.
+
+\begin{equation}
+    e^{At} = \sum_{k=0}^{\infty} \frac{(At)^k}{k!} = I + At + \frac{(At)^2}{2} + \ldots{}
+\end{equation}
+
+\noindent This is not a special case for the exponentiation of a matrix, but just an extension of the definition of the \href{https://en.wikipedia.org/wiki/Exponential_function#Formal_definition}{exponential function}.
+
+\begin{equation}
+    e^a = \sum_{k=0}^{\infty} \frac{a^k}{k!} = 1 + a + \frac{a^2}{2} + \frac{a^3}{6} + \ldots{}
+\end{equation}
+
+\noindent for the case of $A$ above, $e^{At}$ evaluates to,
+
+\begin{equation}
+    \begin{bmatrix}
+        \cos(t) & \sin(t) \\
+        -\sin(t) & \cos(t)
+    \end{bmatrix}
+\end{equation}
+
+\noindent and so we have
+
+\begin{equation}
+    x = \begin{bmatrix}
+        \cos(t) & \sin(t) \\
+        -\sin(t) & \cos(t)
+    \end{bmatrix}
+    \begin{bmatrix}
+        C_1 \\
+        C_2
+    \end{bmatrix}
+\end{equation}
+
+\noindent How do we choose $C$? For that we need the initial conditions. Let's say that,
+
+\begin{equation}
+x(0) \equiv x_0 =
+    \begin{bmatrix}
+        1 \\
+        2
+    \end{bmatrix}
+\end{equation}
+
+\noindent This gives us the set of equations at $t = 0$,
+
+\begin{align}
+    x_1 &= C_1 \cos(0) + C_2 \sin(0) = 1 \\
+    x_2 &= C_2 \cos(0) - C_1 \sin(0) = 2
+\end{align}
+
+\noindent which we can solve for $C_1 = 1$, $C_2 = 2$. So,
+
+\begin{equation}
+    x = \begin{bmatrix}
+        \cos(t) & \sin(t) \\
+        -\sin(t) & \cos(t)
+    \end{bmatrix}
+    \begin{bmatrix}
+        1 \\
+        2
+    \end{bmatrix}
+\end{equation}
+
+\noindent This was a bit easier than the totally general case as the eigenvectors of $E^{At}$ at $t = 0$ are along the axes.
+
+\section{Diagonalizable Differential Equations}
+
+Assume that we have $\dot{x} = Ax$ where $A$ is diagonizable, i.e., we can write it as $A = P^{-1}DP$ where $D$ is a diagonal matrix,
+
+\begin{equation}
+    D = \begin{bmatrix}
+        \lambda_1 & & \\
+                  & \ddots{} & \\
+                  & & \lambda_n
+    \end{bmatrix}
+\end{equation}
+
+\noindent We can then define $P u = x$, which allows us to say,
+
+\begin{align}
+    \dot{x} &= P \dot{u} &&\text{LHS} \\
+    P^{-1}DP x &= DP u  &&\text{RHS} \\
+    \dot{u} &= Du &&\text{}
+\end{align}
+
+\noindent which is the simple decoupled system,
+
+\begin{align}
+    \dot{u}_1 &= \lambda_1 u_1 \\
+              & \dots{} \\
+    \dot{u}_n &= \lambda_n u_n \\
+\end{align}
+
+\noindent which has the solution,
+
+$$
+u_i = C_i e^{\lambda_i t}
+$$
+
+\noindent and can be converted back to x using,
+
+$$
+x = P \begin{bmatrix}
+    C_1 e^{\lambda_1 t} \\
+    \dots \\
+    C_n e^{\lambda_n t} \\
+\end{bmatrix}
+$$
+
+
+See \href{http://people.math.gatech.edu/~xchen/teach/ode/HomogSys.pdf}{notes}
+
+\end{document}

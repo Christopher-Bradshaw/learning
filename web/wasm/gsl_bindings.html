@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <script src="./gsl_bindings.js"></script>
+    <script>
+        // So that this only runs after the imports happen
+        setTimeout(
+            () => {
+                const { bessel_J0 } = Module;
+                console.log(bessel_J0(5));
+            },
+            1000,
+        )
+    </script>
+  </body>
+</html>

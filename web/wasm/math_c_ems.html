@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <script src="./math_c_ems.js"></script>
+    <script>
+        // So that this only runs after the imports happen
+        setTimeout(
+            () => {
+                const add = Module.cwrap("add", "number", ["number", "number"]);
+                console.log(add(1, 2));
+            },
+            1000,
+        )
+
+    </script>
+  </body>
+</html>
+

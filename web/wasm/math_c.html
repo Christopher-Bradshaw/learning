@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <script type="module">
+      (async() => {
+        const response = await fetch('math_c.wasm');
+        const bytes = await response.arrayBuffer();
+        console.log(bytes);
+        const { instance } = await WebAssembly.instantiate(bytes);
+
+        console.log('The answer is: ' + instance.exports.add(1, 2));
+      })();
+    </script>
+  </body>
+</html>

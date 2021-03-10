@@ -1,0 +1,8 @@
+*.o
+*.out
+*.out.js
+*.out.wasm
+*.wasm
+
+gsl-js/
+gsl-lib/

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <script type="module">
+      (async() => {
+        const response = await fetch('math_cpp.wasm');
+        const bytes = await response.arrayBuffer();
+        console.log(bytes);
+        const { instance } = await WebAssembly.instantiate(bytes);
+        // The namespace+function name get mangled
+        console.log('The answer is: ' + instance.exports._ZN4math3addEii(1, 2));
+      })();
+    </script>
+  </body>
+</html>
+

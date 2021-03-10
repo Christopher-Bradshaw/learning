@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <script src="./gsl_bindings_modularize.js"></script>
+    <script>
+        // So that this only runs after the imports happen
+        setTimeout(
+            async () => {
+                const { bessel_J0 } = await gsl();
+                console.log(bessel_J0(5));
+            },
+            1000,
+        )
+    </script>
+  </body>
+</html>
+
