@@ -1,0 +1,47 @@
+% latexmk -outdir=_latex -jobname=halo_bias -pdflatex -pdflatex="pdflatex -halt-on-error" halo_bias.tex
+
+\documentclass{article}
+\usepackage{hyperref}
+
+\begin{document}
+
+\section{Intro}
+
+We have an underlying dark matter density field. What is the relationship between the number density of dark matter halos (of a given mass) and that density field?
+We might expect that these are proportional,
+
+\begin{equation}
+    \frac{n_h}{\bar{n_h}} = \frac{\rho}{\bar{\rho}}
+\end{equation}
+
+\noindent or in other words that halos are a \href{https://en.wikipedia.org/wiki/Poisson_sampling}{poisson sampling} of the underlying density field.
+
+If this were the case, dark matter halos would be an unbiased tracer of the dark matter. And if galaxies formed in dark matter halos in an unbiased way, they would also be an unbisaed tracer of the DM\@.
+
+But, if we look at galaxy surveys we find that there is a massive range of galaxy density. There are incredibly overdense regions and similarly incredibly underdense regions, even on large scales.
+There are two options here,
+\begin{enumerate}
+    \item The underlying DM field is also that nonlinear\footnote{remember that nonlinear means $\frac{d\rho}{\rho} > 1$}
+    \item Galaxies are not tracing the DM
+\end{enumerate}
+
+The second of those is right (how do we know? N-body sims and lensing?).
+
+\section{The cause of bias: Thresholding}
+
+Halos can only form where the underlying matter density reaches a critical value.
+In an EdS universe (matter dominated) all overdensities eventually collapse.
+But, the more overdense ones collapse first.
+This is the visualization with the peaks and the lowering limit.
+
+
+
+
+
+\section{See}
+
+\href{http://www.astro.yale.edu/vdbosch/astro610_lecture10.pdf}{VDB Lecture: Halo bias}
+\href{http://www.astro.yale.edu/vdbosch/astro610_lecture8.pdf}{VDB Lecture: Spherical collapse}
+\href{http://risa.stanford.edu/teaching/463/Lecture8.463.pdf}{RW Lecture: Halo bias}
+
+\end{document}
