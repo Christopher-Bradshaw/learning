@@ -21,7 +21,7 @@ If this were the case, dark matter halos would be an unbiased tracer of the dark
 But, if we look at galaxy surveys we find that there is a massive range of galaxy density. There are incredibly overdense regions and similarly incredibly underdense regions, even on large scales.
 There are two options here,
 \begin{enumerate}
-    \item The underlying DM field is also that nonlinear\footnote{remember that nonlinear means $\frac{d\rho}{\rho} > 1$}
+    \item The underlying DM field is also that nonlinear\footnote{remember that nonlinear means $\delta = \frac{\rho}{\bar{\rho}} > 1$}
     \item Galaxies are not tracing the DM
 \end{enumerate}
 
@@ -35,13 +35,33 @@ But, the more overdense ones collapse first.
 This is the visualization with the peaks and the lowering limit.
 
 
+\section{Bias definition}
+
+The bias $b(M, z)$ is a measure of the (what exactly, in English)
+
+\begin{equation}
+    \frac{n_h}{\bar{n_h}} = (1 + b(M, z)) \delta
+\end{equation}
+
+In the extended Press Schechter formalism we can derive how bias depends on peak height etc.
+
+\begin{equation}
+    b(M, z) = 1 + \bigg(\frac{\nu^2 - 1}{\delta_c}\bigg)
+\end{equation}
+
+where $\delta_c(z) \approx 1.686$ and doesn't change much with redshift (I think this is the overdensity for collapse in EPS?) and $\nu = \delta(z) / \sigma(M, z)$ is the peak-height.
+
+\section{Halo assembly bias}
 
 
 
 \section{See}
 
-\href{http://www.astro.yale.edu/vdbosch/astro610_lecture10.pdf}{VDB Lecture: Halo bias}
-\href{http://www.astro.yale.edu/vdbosch/astro610_lecture8.pdf}{VDB Lecture: Spherical collapse}
-\href{http://risa.stanford.edu/teaching/463/Lecture8.463.pdf}{RW Lecture: Halo bias}
+\begin{itemize}
+    \item \href{http://www.astro.yale.edu/vdbosch/astro610_lecture10.pdf}{VDB Lecture: Halo bias}
+    \item \href{http://www.astro.yale.edu/vdbosch/astro610_lecture8.pdf}{VDB Lecture: Spherical collapse}
+    \item \href{http://risa.stanford.edu/teaching/463/Lecture8.463.pdf}{RW Lecture: Halo bias}
+    \item \href{https://ned.ipac.caltech.edu/level5/Sept12/Kravtsov/Kravtsov3.html}{AK: Cluster formation}
+\end{itemize}
 
 \end{document}
