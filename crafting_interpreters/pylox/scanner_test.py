@@ -66,6 +66,12 @@ class TestSingleLineScanner:
             tokens = scanAndAssert(source, exp)
             assert tokens[1].literal == values[i]
 
+    def test_handles_isolated_literal(self):
+        tests = [("123", TokenType.NUMBER, 123), ('"asdf"', TokenType.STRING, "asdf")]
+        for (source, exp_type, exp_val) in tests:
+            tokens = scanAndAssert(source, [exp_type])
+            assert tokens[0].literal == exp_val
+
     def test_handle_keywords(self):
         source = "orchid and fun"
         exp = [

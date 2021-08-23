@@ -208,7 +208,11 @@ class Scanner:
             self.getNextChar()
 
         # This is a decimal if there is a dot followed by a number
-        if self.peekNextChar() == "." and self.isDigit(self.peek2NextChar()):
+        if (
+            not self.isAtEnd()
+            and self.peekNextChar() == "."
+            and self.isDigit(self.peek2NextChar())
+        ):
             self.getNextChar()
             while self.isDigit(self.peekNextChar()):
                 self.getNextChar()
