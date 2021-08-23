@@ -1,7 +1,8 @@
 # /usr/bin/env python
 
 import sys
-from .scanner import Scanner
+from scanner import Scanner
+from parser import Parser
 
 
 def main():
@@ -20,21 +21,25 @@ def runPrompt():
     while True:
         print("> ", end="")
         line = input()
-        run(line)
+        try:
+            run(line)
+        except Exception as e:
+            print(e)
 
 
 def run(line):
     s = Scanner(line)
     tokens = s.scanTokens()
-
     print(tokens)
-    for token in tokens:
-        print(token)
+
+    p = Parser(tokens)
+    tree = p.parse()
+    print(tree)
 
 
-def runFile():
+def runFile(file):
     pass
 
 
-# if __name__ == "__main__":
-main()
+if __name__ == "__main__":
+    main()
