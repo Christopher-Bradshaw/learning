@@ -1,7 +1,7 @@
 # /usr/bin/env python
 
 import sys
-from scanner import Scanner
+from .scanner import Scanner
 
 
 def main():

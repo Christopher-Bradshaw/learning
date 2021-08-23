@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+from typing import Any
 from enum import Enum, auto
 
 
@@ -51,15 +53,15 @@ class TokenType(Enum):
     EOF = auto()
 
 
+@dataclass
 class Token:
-    def __init__(self, tokenType, lexeme, literal, lineNumber):
-        self.tokenType = tokenType
-        self.lexeme = lexeme
-        self.literal = literal
-        self.lineNumber = lineNumber
+    tokenType: TokenType
+    lexeme: str
+    literal: Any  # str or float
+    lineNumber: int
 
     def __repr__(self):
-        return f"{self.tokenType} {self.lexeme} {self.literal}"
+        return f"({self.tokenType} {self.lexeme} {self.literal})"
 
 
 class Scanner:
@@ -142,9 +144,8 @@ class Scanner:
         self.start = self.current
 
     def addToken(self, tokenType, literal=None):
-        self.tokens.append(
-            Token(tokenType, self.source[self.start : self.current], literal, self.line)
-        )
+        lexeme = self.source[self.start : self.current]
+        self.tokens.append(Token(tokenType, lexeme, literal, self.line))
 
     def getNextChar(self):
         c = self.source[self.current]
