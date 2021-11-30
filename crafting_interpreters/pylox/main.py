@@ -3,6 +3,7 @@
 import sys
 from scanner import Scanner
 from parser import Parser
+from interpreter import Interpreter
 
 
 def main():
@@ -35,6 +36,11 @@ def run(line):
     p = Parser(tokens)
     tree = p.parse()
     print(tree)
+
+    i = Interpreter()
+    # v = tree.accept(i)
+    # print(v)
+    # return v
 
 
 def runFile(file):

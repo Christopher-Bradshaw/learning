@@ -5,7 +5,8 @@ from scanner import TokenType
 
 
 class Expr:
-    pass
+    def accept(self, visitor):
+        return getattr(visitor, f"visit{type(self).__name__}Expr")(self)
 
 
 @dataclass
@@ -31,16 +32,86 @@ class Unary(Expr):
     right: Any
 
 
+@dataclass
+class Variable(Expr):
+    name: str
+
+
+class Stmt:
+    def accept(self, visitor):
+        return getattr(visitor, f"visit{type(self).__name__}Stmt")(self)
+
+
+@dataclass
+class Print(Stmt):
+    expression: Expr
+
+
+@dataclass
+class Expression(Stmt):
+    expression: Expr
+
+
+@dataclass
+class Var(Stmt):
+    name: str
+    initializer: Expr
+
+
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
         self.current = 0
+        self.statements = []
 
     def parse(self):
-        tree = self.expression()
-        if not self.isAtEnd():
-            raise ExtraTokensInExprError(self.peek())
-        return tree
+        # breakpoint()
+        while not self.isAtEnd():
+            self.statements.append(self.declaration())
+
+        # tree = self.expression()
+
+        # # We want to add a synchonization thing here once we parse full programs
+        # # To allow us to catch most errors
+        # # http://craftinginterpreters.com/parsing-expressions.html#panic-mode-error-recovery
+        # http://craftinginterpreters.com/statements-and-state.html#parsing-variables
+        # if not self.isAtEnd():
+        #     raise ExtraTokensInExprError(self.peek())
+        # return tree
+
+        return self.statements
+
+    def declaration(self):
+        if self.match(TokenType.VAR):
+            return self.varDeclaration()
+        else:
+            return self.statement()
+
+    def varDeclaration(self):
+        name = self.consume(ExpectedIdentifierError, TokenType.IDENTIFIER).lexeme
+        expr = None
+        if self.match(TokenType.EQUAL):
+            expr = self.expression()
+
+        self.consume(UnterminatedStatementError, TokenType.SEMICOLON)
+
+        return Var(name, expr)
+
+    def statement(self):
+        if self.match(TokenType.PRINT):
+            return self.printStatement()
+        else:
+            return self.expressionStatement()
+
+    def printStatement(self):
+        expr = self.expression()
+        self.consume(UnterminatedStatementError, TokenType.SEMICOLON)
+        return Print(expr)
+
+    def expressionStatement(self):
+        expr = self.expression()
+        self.consume(UnterminatedStatementError, TokenType.SEMICOLON)
+        return Expression(expr)
 
     def expression(self):
         return self.equality()
@@ -92,7 +163,9 @@ class Parser:
         return expr
 
     def primary(self):
-        if self.match(TokenType.FALSE):
+        if self.match(TokenType.IDENTIFIER):
+            return Variable(self.previous().lexeme)
+        elif self.match(TokenType.FALSE):
             return Literal(False)
         elif self.match(TokenType.TRUE):
             return Literal(True)
@@ -102,7 +175,7 @@ class Parser:
             return Literal(self.previous().literal)
         elif self.match(TokenType.LEFT_PAREN):
             expr = self.expression()
-            self.consume(TokenType.RIGHT_PAREN)
+            self.consume(UnterminatedGroupingError, TokenType.RIGHT_PAREN)
             return Grouping(expr)
         elif self.isAtEnd():
             raise EndOfExpressionError()
@@ -127,11 +200,11 @@ class Parser:
     def previous(self):
         return self.tokens[self.current - 1]
 
-    def consume(self, *types):
+    def consume(self, err, *types):
         if self.check(*types):
             self.advance()
             return self.previous()
-        raise UnterminatedGroupingError()
+        raise err
 
     def advance(self):
         # if not self.isAtEnd():
@@ -155,6 +228,18 @@ class ExtraTokensInExprError(Exception):
 class EndOfExpressionError(Exception):
     def __init__(self):
         self.message = f"Surprise end of expression"
+        super().__init__(self.message)
+
+
+class UnterminatedStatementError(Exception):
+    def __init__(self):
+        self.message = f"Expected semicolon"
+        super().__init__(self.message)
+
+
+class ExpectedIdentifierError(Exception):
+    def __init__(self):
+        self.message = f"Expected identifier"
         super().__init__(self.message)
 
 
