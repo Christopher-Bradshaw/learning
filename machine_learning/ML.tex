@@ -7,6 +7,10 @@
 \usepackage{algpseudocode}
 \usepackage{graphicx}
 \usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, calc}
+% \usepackage{showframe}
+
 \hypersetup{
     colorlinks,
     linkcolor={red!50!black},
@@ -65,7 +69,7 @@ and recall as ``the fraction of true events that were positives''.
 
 When a high precision classifier calls something positive, it is usually true (but unless it is high recall, it might call many true events false too).
 When a high recall gets a true event, it will usually call it positive (but unless it is precise it will also call many other things positive).
-A related concept useful for showing this data to people is the confusion matrix. This is a 2x2 matrix with columns of the event (True, False) and rows with the prediction (Positive, Negative) and the counts in each cell.
+A related concept useful for showing this data to people is the confusion matrix. This is a $2 \times 2$ matrix with columns of the event (True, False) and rows with the prediction (Positive, Negative) and the counts in each cell.
 
 \begin{figure}[h!]
     \centering
@@ -87,7 +91,7 @@ However, that naive classifier would have recall of $0$ and therefore a terrible
 We often need to trade recall for precision. In the medical example above, as we start to claim positives in some situations our recall will improve (as we identify some true positives) but our precision will decrease (as we identify as true some negatives). We can think of this as changing the threshold on a model that outputs something that looks like a probability.
 
 If we plot a figure with axes of (precision, recall), models with extremely low thresholds will sit roughly at (0, 1) or (terrible precision because there are so many positives, great recall because everything is positive). Models with high thresholds will sit at (1, 0) or (great precision because we only claim a positive if we are really sure, terrible recall because of that high threshold).
-A good model will also have a point near (1, 1) rather than trending down the `r = p` line.
+A good model will also have a point near (1, 1) rather than trending down the $r = p$ line.
 We can show this in \autoref{fig:ROC} which shows something slightly different (slightly different axes), but the same idea.
 
 \begin{figure}[h!]
@@ -103,6 +107,30 @@ We can show this in \autoref{fig:ROC} which shows something slightly different (
 
 \subsubsection{Mean Squared Error (MSE)}
 \section{Activation Functions}
+
+% Can't put in table
+% $$
+% \begin{cases} 
+%     0 &\quad x < 0 \\
+%     x &\quad x > 0 
+% \end{cases} 
+% $$
+
+\begin{center}
+\begin{tabular}{ l l l l l }
+ \hline
+ Name & Function & Range & Differentiable? & Zero centered \\
+ \hline
+Rectified Linear Unit (ReLU)    & 
+x
+                                                                    & $ [0, \infty) $   & Everywhere except 0   & No \\
+ Sigmoid                        & $\sigma(x) = \frac{1}{1+e^{-x}}$  & $ (0, 1) $        & Yes                   & No \\
+ Tanh                           & F                                 & $ (-1, 1) $       & Yes                   & Yes \\
+ \hline
+\end{tabular}
+\end{center}
+
+
 
 \subsection{ReLU (Rectified Linear Unit)}
 
@@ -163,6 +191,126 @@ This makes sense if we interpret the output layer before the activation function
 Backpropagation (or just backprop) is a method for computing the gradient. Specifically we are interested in $\nabla_{x} f(x, y)$, where $f$ is an arbitrary function, $y$ are inputs to the function whose derivatives we are not interested in, and $x$ are variables whose derivatives we want.
 For machine learning, those $x$ are the parameters (weights and biases) of the neurons.
 
+It is maybe nicer to think about this not as finding the gradient (a vector in high dimensional space pointing downhill) but rather as finding the sensitivity of the cost to each parameter (a bunch of partial derivatives).
+It amounts to the same thing, but one is easier to visualize that the other.
+
+\subsection{A single neuron (Final Layer)}
+
+Let's first look at the last layer ($L$) of a network that has a single neuron, and a single incoming activation (the previous layer also had a single neuron). We assume a MSE loss function and a sigmoid activation function.
+
+\begin{align}
+    z^{(L)} &= w^{(L)} a^{(L - 1)} + b^{(L)} \\
+    a^{(L)} &= \sigma(z^{(L)}) \\
+    C &= (a^{(L)} - y)^2
+\end{align}
+
+\noindent
+We want to know how the weight $w^{(L)}$ and bias $b^{(L)}$ on this layer effect the cost $C$.
+$$
+\frac{\partial C}{\partial w^{(L)}} \text{  and  }
+\frac{\partial C}{\partial b^{(L)}}
+$$
+As we have represented the process as a nested sequence of functions,
+$$
+C = \text{cost}(\text{activation}(\text{affine}(a^{(L - 1)})))
+$$
+this derivative can be computed using the chain rule\footnote{
+Given $h(x) = f(g(x))$ the chain rule tells us that $h'(x) = f'(g(x)) \cdot g'(x)$ or ``the derivative of the outer evaluated at the inner multiplied by the derivative of the inner''. But, if we assign the output of the inner function to an intermediate variable, $y = g(x)$ and the output for the combination to $z = f(g(x)) = h(x)$, we can rewrite this as $h'(x) = f'(y) \cdot g'(x)$ or more suggestively $ \frac{dz}{dx} = \frac{dz}{dy} \frac{dy}{dx} $.
+}.
+
+
+\begin{equation}
+    \frac{\partial C}{\partial w^{(L)}} = \frac{\partial C}{\partial a^{(L)}} \frac{\partial a^{(L)}}{\partial z^{(L)}} \frac{\partial z^{(L)}}{\partial w^{(L)}}
+    \label{eq:finalLayerChain}
+\end{equation}
+
+\noindent
+Evaluating all these derivatives gives us,
+
+\begin{align}
+    \frac{\partial C}{\partial w^{(L)}} &= 2(a^{(L)} - y) \cdot \frac{e^{-z^{(L)}}}{(1 - e^{-z^{(L)}})^2} \cdot a^{(L - 1)} \\
+    \frac{\partial C}{\partial b^{(L)}} &= 2(a^{(L)} - y) \cdot \frac{e^{-z^{(L)}}}{(1 - e^{-z^{(L)}})^2}
+\end{align}
+
+What does this tell us? Let's assume $a^{(L)} < y$. Then the first term $2(a^{(L)} - y)$ is negative. The second term is always positive as the sigmoid function increases monotonically. Thus $\frac{\partial C}{\partial b^{(L)}} < 0$ which means that increasing the bias decreases the cost. This makes sense as increasing $b^{(L)}$ increases $z^{(L)}$ and $a^{(L)}$. Conversely if $a^{(L)} > y$ increasing the bias will increase the cost.
+The weight follows a similar argument, though the signs will switch if $a^{(L - 1)} < 0$.
+
+Which factor is more efficient at impacting the cost? This depends entirely on the incoming activation. If $|a^{(L - 1)}| > 1$ the cost responds more to the weight than the bias.
+
+
+\subsection{A Single Neuron (Hidden Layer)}
+
+We've seen how to compute the derivative of the cost w.r.t. the bias and weight of the final layer. How do we do the same for previous layers?
+
+We can extend \autoref{eq:finalLayerChain} to the previous layer,
+
+\begin{equation}
+    \frac{\partial C}{\partial w^{(L - 1)}} =
+        \frac{\partial C}{\partial a^{(L)}}
+        \frac{\partial a^{(L)}}{\partial z^{(L)}}
+        \frac{\partial z^{(L)}}{\partial a^{(L - 1)}}
+        \frac{\partial a^{(L - 1)}}{\partial z^{(L - 1)}}
+        \frac{\partial z^{(L - 1)}}{\partial w^{(L - 1)}}
+    \label{}
+\end{equation}
+
+\noindent
+where the only new ingredient is,
+
+\begin{equation}
+    \frac{\partial z^{(L)}}{\partial a^{(L - 1)}} = w^{(L)}
+\end{equation}
+
+\noindent
+This can be understood nicely with a graph,
+
+\begin{tikzpicture}[scale = 10]
+\begin{scope}[every node/.style={}]
+
+    \node (C) at (1, 0.5) {$C$};
+    % layer
+    \node (A_L) at (0.75, 0.5) {$a^{(L)}$};
+    \node (y) at (0.75, 0.3) {$y$};
+    % Layer
+    \node (Z_L) at (0.5, 0.5) {$z^{(L)}$};
+    % Layer
+    \node (A_L1) at (0.25, 0.5) {$a^{(L - 1)}$};
+    \node (W_L) at (0.25, 0.3) {$w^{(L)}$};
+    \node (B_L) at (0.25, 0.7) {$b^{(L)}$};
+    % Layer
+    \node (Z_L1) at (0, 0.5) {$z^{(L - 1)}$};
+\end{scope}
+
+\begin{scope}[
+    every edge/.style={draw=blue,thick}
+]
+    \path [->] (A_L) edge (C);
+    \path [->] (y) edge (C);
+    % Layer
+    \path [->] (Z_L) edge node[above] {$\sigma$} (A_L);
+    % Layer
+    \path [->] (W_L) edge (Z_L);
+    \path [->] (B_L) edge (Z_L);
+    \path [->] (A_L1) edge (Z_L);
+    % Layer
+    \path [->] (Z_L1) edge node[above] {$\sigma$} (A_L1);
+\end{scope}
+\end{tikzpicture}
+
+\noindent
+Backpropagation walks backwards (from $C$) along this graph, keeping track of the derivative as it goes. So,
+
+\begin{align}
+    \textcolor{red}{\frac{\partial a^{(L)}}{\partial C}} &= 2 (a^{(L)} - y) \\
+    \textcolor{blue}{\frac{\partial z^{(L)}}{\partial C}} &= \sigma '(z^{(L)}) \cdot \textcolor{red}{\frac{\partial a^{(L)}}{\partial C}} \\
+    % Layer
+    \frac{\partial b^{(L)}}{\partial C} &= \textcolor{blue}{\frac{\partial z^{(L)}}{\partial C}} \\
+    \textcolor{purple}{\frac{\partial a^{(L - 1)}}{\partial C}} &= w^{(L)} \cdot \textcolor{blue}{\frac{\partial z^{(L)}}{\partial C}} \\
+    \frac{\partial w^{(L)}}{\partial C} &= a^{(L - 1)} \cdot \textcolor{blue}{\frac{\partial z^{(L)}}{\partial C}} \\
+    % Layer
+   \textcolor{orange}{\frac{\partial z^{(L - 1)}}{\partial C}} &=  \sigma '(z^{(L-1)}) \cdot \textcolor{purple}{\frac{\partial a^{(L - 1)}}{\partial C}} &
+\end{align}
+
 
 \section{Data Inputs}
 
@@ -212,8 +360,8 @@ The choice of $\Sigma$ is relatively free.
 Two popular options are the $L^2$ and $L^1$ norms.
 
 \begin{align}
-    \text{L2:} || \theta ||_2 =& \sqrt{x_1^2 + ... + x_n^2} \\
-    \text{L1:} || \theta ||_1 =& | x_1 | + ... + | x_n |
+    \text{L2:} || \theta ||_2 =& \sqrt{x_1^2 + \cdots + x_n^2} \\
+    \text{L1:} || \theta ||_1 =& | x_1 | + \cdots + | x_n |
 \end{align}
 
 These have different effects. The L1 norm promotes sparsity.
@@ -228,7 +376,7 @@ Exactly what forms of augmentation are available depend on the problem. However 
 
 \begin{itemize}
     \item Addition of noise (e.g. Gaussian noise on top of an image)
-    \item Rotation/transformation/scaling of the image (though not when that would change the meaning (b d) or result in unlikely data (upside down photos)
+    \item Rotation/transformation/scaling of the image (though not when that would change the meaning (b d) or result in unlikely data (upside down photos))
 \end{itemize}
 
 
@@ -287,7 +435,7 @@ If the gradient points up the slope, $-\nabla f(x)$ points in the direction of g
 \end{equation}
 
 \noindent
-Practically, the function is not linear and may not have any roots (in ML, these might only exist where the loss is 0). What we are interested in finding is the location where $f(x)$ is minimized, i.e. where the {\em gradient} is 0.
+Practically, the function is not linear and may not have any roots (in ML, these might only exist where the loss is 0). What we are interested in finding is the location where $f(x)$ is minimized, i.e. where the {\em gradient\/} is 0.
 
 \subsection{Gradient Descent}
 
@@ -297,30 +445,30 @@ The obvious thing to do is just to move in the opposite direction to the gradien
 
 \begin{algorithm}
 \begin{algorithmic}
-    \Require Learning rate $\epsilon$
-    \Require initial state $\theta$
+    \Require{} Learning rate $\epsilon$
+    \Require{} initial state $\theta$
     \While{---}
-        \State Make an estimate (somehow) of the gradient ($\hat{g}$)
-        \State Update $\theta = \theta - \epsilon \hat{g}$
-    \EndWhile
+        \State{} Make an estimate (somehow) of the gradient ($\hat{g}$)
+        \State{} Update $\theta = \theta - \epsilon \hat{g}$
+    \EndWhile{}
 \end{algorithmic}
 \end{algorithm}
 
 \subsection{Momentum Gradient Descent}
 
-In the standard gradient descent, each step is independent from the others and depends only on the gradient we estimated at that point. This might sound reasonable (why should previous estimates of the gradient at other points have a say on the current step?) but when the learning rate is small previous gradients {\em are} relevant. In fact, if the gradient estimates we get are noisy (from e.g. small minibatch sizes) estimates of the gradient using multiple minibatches from nearby locations can dramatically reduce the number of optimization steps required.
+In the standard gradient descent, each step is independent from the others and depends only on the gradient we estimated at that point. This might sound reasonable (why should previous estimates of the gradient at other points have a say on the current step?) but when the learning rate is small previous gradients {\em are\/} relevant. In fact, if the gradient estimates we get are noisy (from e.g. small minibatch sizes) estimates of the gradient using multiple minibatches from nearby locations can dramatically reduce the number of optimization steps required.
 
-The physical analogy often drawn here is of a ball rolling around a 2d surface. Its velocity is not set directly by the gradient. Rather, the gradient acts as an acceleration, {\em modifying} the velocity. This analogy also explains the name of this method as velocity $\propto$ momentum.
+The physical analogy often drawn here is of a ball rolling around a 2d surface. Its velocity is not set directly by the gradient. Rather, the gradient acts as an acceleration, {\em modifying\/} the velocity. This analogy also explains the name of this method as velocity $\propto$ momentum.
 
 \begin{algorithm}
 \begin{algorithmic}
-    \Require Learning rate $\epsilon$, momentum parameter $0 < \alpha < 1$
-    \Require initial state $\theta$, initial velocity $v \gets 0$
+    \Require{} Learning rate $\epsilon$, momentum parameter $0 < \alpha < 1$
+    \Require{} initial state $\theta$, initial velocity $v \gets 0$
     \While{---}
-        \State Make an estimate (somehow) of the gradient ($\hat{g}$)
-        \State Update the velocity $v = \alpha v - \epsilon \hat{g}$
-        \State Update $\theta = \theta + v$
-    \EndWhile
+        \State{} Make an estimate (somehow) of the gradient ($\hat{g}$)
+        \State{} Update the velocity $v = \alpha v - \epsilon \hat{g}$
+        \State{} Update $\theta = \theta + v$
+    \EndWhile()
 \end{algorithmic}
 \end{algorithm}
 
@@ -329,13 +477,13 @@ Notice that: $\alpha = 0$ is equivalent to the momentum free gradient descent. O
 What impact does this have on the step size? In the momentum free gradient descent, the largest step is $s = \epsilon g$. With momentum, successive gradients in the same direction result in,
 
 \begin{equation}
-    v = s + \alpha s + \alpha^2 s + ... + \alpha^n s = s \sum_{n=0}^{\infty} \alpha^n = \frac{s}{1 - \alpha}
+    v = s + \alpha s + \alpha^2 s + \cdots + \alpha^n s = s \sum_{n=0}^{\infty} \alpha^n = \frac{s}{1 - \alpha}
 \end{equation}
 
 If the steps are in opposite, or near to opposite, directions (e.g. when descending down a narrow valley, we might jump from cliff to cliff),
 
 \begin{equation}
-    v = s - \alpha s + \alpha^2 s - ... + \alpha^n s = s \sum_{n=0}^{\infty} (-\alpha)^n = \frac{s}{1 + \alpha}
+    v = s - \alpha s + \alpha^2 s - \cdots{} + \alpha^n s = s \sum_{n=0}^{\infty} (-\alpha)^n = \frac{s}{1 + \alpha}
 \end{equation}
 
 \noindent

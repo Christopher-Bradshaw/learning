@@ -1,0 +1,267 @@
+\documentclass{article}
+
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+\newcommand{\norm}[1]{\mbox{\ensuremath{\parallel #1 \parallel}}}
+\newcommand{\takeaway}[1]{{\color{red} #1}}
+
+\hypersetup{
+    colorlinks,
+    linkcolor={red!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+
+\graphicspath{ {.} }
+
+\begin{document}
+
+\noindent\makebox[\textwidth][c]{\Large\bfseries Linear Algebra}
+\tableofcontents
+
+\section{Glossary}
+
+\subsection{Rank}
+
+The dimension of the vector space spanned by its columns. This is the same as the number of linearly independent columns.
+A matrix has {\em full rank\/} if its rank is equal to its number of columns and {\em rank deficient\/} if it does not have full rank.
+
+\subsection{Span}
+
+\subsection{Eigenvectors}
+
+An eigenvector of a linear transformation (matrix) is a vector that changes only in scale when that transformation is applied.
+
+\begin{equation}
+    \boldsymbol{A} x = \lambda x
+\end{equation}
+
+
+\subsection{Eigenvalue}
+
+The scale corresponding to a given eigenvector.
+
+\subsection{Positive Definite}
+
+Note that we only consider symmetric (and therefore square) matrixes to be positive definite.
+
+A matrix is positive definite if it satisfies,
+
+\begin{equation}
+    x^T \boldsymbol{A} x > 0 \text{ for all } x \in \mathbb{R}^n \setminus \{ 0 \}
+\end{equation}
+
+\noindent
+A matrix is positive semi-definite if it satisfies,
+
+\begin{equation}
+    x^T \boldsymbol{A} x \geq 0 \text{ for all } x \in \mathbb{R}^n
+\end{equation}
+
+\subsection{Determinant}
+\subsection{Singular}
+
+A matrix is singular if it has no inverse.
+
+\subsection{Orthogonal + Orthonormal}
+
+Orthogonal means that all components are 90 degrees apart.
+Orthonormal means that they are also of unit length.
+
+\section{Useful Small Theorems}
+
+$A A^T$ is square and symmetric.
+
+\section{Eigenvalues and Eigenvectors}
+
+The basic equation we want to solve for is,
+
+$$Ax = \lambda x$$
+
+where the task is to find the vector $x$ that has only its length changed by factor $\lambda$ when acted on by matrix $A$.
+
+
+
+\section{Conditioning}
+
+See Intro to Lin Alg 4th ed
+
+\subsection{Matrix Norms}
+
+How can we estimate the size of a matrix? For vectors we have {\em norms\/} that look something like,
+
+\begin{equation}
+    \parallel x \parallel_p = \big( \sum_{i=1}^{n} |x_i|^p \big)^{1/p}
+\end{equation}
+
+\noindent
+where  $\parallel x \parallel_2$ is the Euclidean norm (or length). We could do pretty much the same thing for matrixes and define
+
+\begin{equation}
+    \parallel x \parallel_p = \big( \sum_{i=1}^{n} \sum_{j=1}^{m} |x_{i, j}|^p \big)^{1/p}
+\end{equation}
+
+\noindent
+where $p = 2$ is the Frobenius norm. This is sometimes useful, but not what we will use here.
+
+
+Instead we define $\norm{A}$ by the {\em largest impact it can have on the length of a vector\/}.
+
+\begin{equation}
+    \norm{A} =  \frac{\norm{Ax}}{\norm{x}} \quad (\text{max over } x \ne 0)
+    \label{eq:matrix_norm_definition}
+\end{equation}
+
+\subsubsection{Examples}
+
+\paragraph{Orthogonal Matrixes:}
+The simplest example is a diagonal matrix. For this, \norm{A} is the largest entry (and can be found by choosing $x$ is along that direction).
+For an orthogonal matrix , the same argument a similar argument applied and \norm{A} is the length of the longest column vector.
+
+\paragraph{Symmetric Matrixes:}
+For symmetric matrixes, \norm{A} is the absolute value of the largest eigenvalue $| \lambda_{\rm max} | $. We can show this by diagonalizing the matrix, $A = \Lambda Q \Lambda^T$ and noting the $\norm{Q}$ will be that of the largest absolute value eigenvalue on the diagonal and $\norm{Q} = 1$ as it leaves lengths unchanged.
+
+\paragraph{Unsymmetric Matrixes:}
+
+Things become a bit more complicated if $A$ is not symmetric. \autoref{eq:matrix_norm_definition} still holds, but we can no longer compute it directly from the eigenvalues.
+In this case $\norm{A} = \norm{A A^T}$ where the right hand side is symmetric and we can therefore use the eigenvalues.
+TODO: work out why this is true!
+
+\subsection{Condition Number}
+
+In linear algebra problems, we are often trying to solve $Ax = b$ where $A$ and $b$ are known.
+Suppose that there is some error in our $b$, whether from measurement error, or simply numerical precision and we instead have $b + \Delta b$.
+How much does that change $x$?
+
+\begin{align}
+    A (x + \Delta x) & = b + \Delta b    \\
+    Ax + A \Delta x  & = b + \Delta b    \\
+    A \Delta x       & = \Delta b        \\
+    \Delta x         & = A^{-1} \Delta b
+\end{align}
+
+\noindent
+Exactly how large this change is depends on the direction $\Delta b$ is pointing, but in the worst case (when $\Delta b$ is in the direction of the vector that produces the norm of $A^{-1}$),
+
+\begin{equation}
+    \norm{\Delta x} = \norm{A^{-1}} \norm{\Delta b}
+\end{equation}
+
+\noindent
+Really what we care about is not $\Delta x$ but the the {\em relative error\/}. Otherwise, multiplying $A$ by a large number would result in a $A^{-1}$ being smaller by the same factor and thus $\Delta x$ being small. But in that case, $x$ would also be small and so small changes in $\Delta x$ are very significant!
+To be even more specific, we care about the ratio of the relative error in the solution to that of the inputs.
+Thinking of it this way, the condition number is a {\em derivative\/}.\footnote{
+    From wikipedia: The condition number is formally defined as the value of the asymptotic worst-case relative change in output for a relative change in input
+}
+
+\begin{equation}
+    c =
+    \frac{\norm{\Delta x}}{\norm{x}} / \frac{\norm{\Delta b}}{\norm{b}} =
+    \frac{\norm{\Delta x}}{\norm{\Delta b}} / \frac{\norm{x}}{\norm{b}} =
+    \norm{A^{-1}} / \frac{1}{\norm{A}} =
+    \norm{A^{-1}} \norm{A}
+\end{equation}
+
+\noindent
+This definition also has the nice property that it is independent of scaling of $A$. And from this it is clear that,
+
+\begin{equation}
+    \frac{\norm{\Delta x}}{\norm{x}} \leq c \, \frac{\norm{\Delta b}}{\norm{b}}
+\end{equation}
+
+\noindent
+where we switch to $\leq$ because previously we have been handling the worst case and in general the error may be smaller than that.
+So, the relative error in the solution is no more than $c$ times larger the relative error in our data.
+
+This is also true if the error is in $A$. I should work this out.
+
+\subsubsection{Examples}
+
+\paragraph{Symmetric Matrixes:}
+
+For symmetric matrixes we know that the norm is the absolute value of the largest eigenvalue. Let's first just consider diagonal matrixes (where the eigenvalues are on the diagonal) and remember that we are trying to solve $A x = b$.
+
+\begin{equation}
+    A = \begin{bmatrix}
+        \lambda_1 & 0         \\
+        0         & \lambda_2 \\
+    \end{bmatrix}
+    \qquad
+    A^{-1} = \begin{bmatrix}
+        1/\lambda_1 & 0           \\
+        0           & 1/\lambda_2 \\
+    \end{bmatrix}
+\end{equation}
+
+\noindent
+Clearly \norm{A} is large if one of the $\lambda$ is very large. Similarly \norm{A^{-1}} is large if one is very small.
+Why is this the case? Let's consider a concrete example. Assume $\lambda_1 = 10$ and $\lambda_2 = 1/10$. Then, $c = 100$.
+$x$ will be small if $b$ is along the large eigenvector as that makes $x$ {\em less\/} sensitive to $b$ (large changes in $b$ result in small changes to $x$). So choose $b$ to be along $[1, 0]$.
+$\Delta x$ will be large if $\Delta b$ is along the small eigenvector for the inverse reasons as before. So choose to perturb $b$ along $[0, 1]$.
+If $b = [10, 0]$ then $x = [1, 0]$. However, if $b + \Delta b = [10, 1]$ then $x = [1, 10]$ and $\Delta x = [0, 10]$.
+Thus
+
+\begin{align}
+    \frac{\norm{\Delta x}}{\norm{x}} & \leq c \, \frac{\norm{\Delta b}}{\norm{b}} \\
+    \frac{10}{1}                     & \leq c \, \frac{1}{10}                     \\
+    100                              & \leq c
+\end{align}
+
+\noindent
+Where we hit the worst case because of how we chose our vector and perturbation. Our initial $x$ was small because $b$ it was in a direction that $A$ had a strong effect on. Our perturbation was in a direction that $A$ did not have a strong effect on, and so necessitated a large change in $x$.
+\takeaway{A symmetric matrix has poor conditioning if the range of eigenvalues is large.}
+
+\paragraph{Nearly Colinear Matrixes:}
+
+Consider a matrix that looks like,
+
+\begin{equation}
+    A = \begin{bmatrix}
+        1 & 1            \\
+        1 & 1 + \Delta y \\
+    \end{bmatrix}
+\end{equation}
+
+This is a symmetric matrix and so the arguments from the previous section hold. We just need to know the ratio of the eigenvalues to compute the condition number. The eigenvalues and vectors for this matrix, if $\Delta y = 0$ are,
+
+\begin{equation}
+    \begin{bmatrix}
+        1 \\
+        1 \\
+    \end{bmatrix} \rightarrow
+    \begin{bmatrix}
+        2 \\
+        2 \\
+    \end{bmatrix} \; (\lambda_1 = 2) \qquad
+    \begin{bmatrix}
+        -1 \\
+        1  \\
+    \end{bmatrix} \rightarrow
+    \begin{bmatrix}
+        0 \\
+        0 \\
+    \end{bmatrix} \; (\lambda_2 = 0)
+\end{equation}
+
+As we increase $\Delta y$, the eigenvectors slowly rotate counter clockwise and both eigenvalues slowly increase. We can compute the eigenvalues by solving for ${\rm \bf det} (A - \lambda I) = 0$. This looks like,
+
+\begin{align}
+    {\rm \bf det} (A - \lambda I)                      & = 0       \\
+    (1 - \lambda) (1 + \Delta y - \lambda) - 1         & = 0       \\
+    \lambda^2 - \lambda(2 + \Delta y)+ \Delta y        & = 0       \\
+    \frac{(2 + \Delta y) \pm \sqrt{\Delta y^2 + 4}}{2} & = \lambda
+\end{align}
+
+\noindent
+For small $\Delta y$ this results in (to first order) $\lambda = 2 + \Delta y/2$ and $\Delta y/2$. For small $\Delta y$, the ratio between these is large. \takeaway{Nearly colinear matrixes are therefore poorly conditioned.}
+
+
+\bibliographystyle{plainnat}
+\bibliography{/home/christopher/research/papers/all}
+\end{document}
